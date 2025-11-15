@@ -1,0 +1,39 @@
+{
+  "name": "fullstack-backend-zero",
+  "version": "1.0.0",
+  "description": "He Thong Luyen Thi ",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node ./src/server.js",
+    "dev": "nodemon ./src/server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/HaryNguyn/fullstack-backend.git"
+  },
+  "keywords": [
+    "nodejs",
+    "react"
+  ],
+  "author": "Harringuyn",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/HaryNguyn/fullstack-backend/issues"
+  },
+  "homepage": "https://github.com/HaryNguyn/fullstack-backend#readme",
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "cors": "^2.8.5",
+    "dotenv": "16.0.3",
+    "ejs": "^3.1.10",
+    "express": "^4.18.2",
+    "multer": "^2.0.2",
+    "mysql2": "^3.15.2",
+    "uuid": "^13.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.9.2",
+    "nodemon": "^3.1.10"
+  }
+}
