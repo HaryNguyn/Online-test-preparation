@@ -13,6 +13,7 @@ import { initializeMockData } from "@/lib/mock-data"
 
 interface AuthContextValue {
   user: User | null
+  setUser: (user: User | null) => void
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>
   register: (
     email: string,
@@ -142,7 +143,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   const value = useMemo(
-    () => ({ user, login, register, logout, resetPassword, changePassword, isLoading }),
+    () => ({ user, setUser, login, register, logout, resetPassword, changePassword, isLoading }),
     [user, isLoading],
   )
 

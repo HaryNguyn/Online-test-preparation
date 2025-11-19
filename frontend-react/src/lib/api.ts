@@ -53,6 +53,28 @@ export const api = {
       body: JSON.stringify(payload),
     }),
 
+  updateProfile: (userId: string, payload: { name?: string; avatar_url?: string | null; grade?: string }) =>
+    request<{ message: string; user: User }>(`/users/${userId}`, {
+      method: "PUT",
+      body: JSON.stringify(payload),
+    }),
+
+  uploadFile: (file: File): Promise<{ url: string }> => {
+    const formData = new FormData()
+    formData.append("file", file)
+    return fetch(`${API_BASE}/upload`, {
+      method: "POST",
+      body: formData,
+      credentials: "include",
+    }).then(async (res) => {
+      if (!res.ok) {
+        const error = await res.json().catch(() => ({ error: `HTTP ${res.status}` }))
+        throw new Error(error.error || `HTTP ${res.status}`)
+      }
+      return res.json()
+    })
+  },
+
   getExams: (params?: { status?: string; subject?: string; grade_level?: string; created_by?: string }) => {
     const qs = new URLSearchParams()
     if (params) {
@@ -90,6 +112,17 @@ export const api = {
   getExamSubmissions: (examId: string) => request<{ submissions: SubmissionDTO[] }>(`/submissions/exam/${examId}`),
 
   getSubmission: (id: string) => request<{ submission: SubmissionDTO }>(`/submissions/${id}`),
+
+  getPendingSubmissions: (examId?: string) => {
+    const suffix = examId ? `?exam_id=${examId}` : ""
+    return request<{ submissions: SubmissionDTO[] }>(`/submissions/pending${suffix}`)
+  },
+
+  gradeSubmission: (id: string, payload: { essay_scores: Record<number, number>; graded_by: string }) =>
+    request<{ message: string; submission: SubmissionDTO }>(`/submissions/${id}/grade`, {
+      method: "PUT",
+      body: JSON.stringify(payload),
+    }),
 
   getExamLeaderboard: (examId: string, limit = 10) =>
     request<{ leaderboard: LeaderboardEntry[] }>(`/leaderboard/exam/${examId}?limit=${limit}`),

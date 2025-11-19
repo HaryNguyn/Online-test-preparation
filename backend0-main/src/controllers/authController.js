@@ -32,10 +32,19 @@ const authController = {
                 [userId, email, hashedPassword, name, role]
             );
             
-            const [user] = await connection.query(
-                'SELECT id, email, name, role, created_at FROM Users WHERE id = ?',
-                [userId]
-            );
+            // Try to select with avatar_url, fallback if column doesn't exist
+            let user;
+            try {
+                [user] = await connection.query(
+                    'SELECT id, email, name, role, grade, avatar_url, created_at FROM Users WHERE id = ?',
+                    [userId]
+                );
+            } catch (error) {
+                [user] = await connection.query(
+                    'SELECT id, email, name, role, grade, created_at FROM Users WHERE id = ?',
+                    [userId]
+                );
+            }
             
             res.status(201).json({ 
                 message: 'User registered successfully',
@@ -74,9 +83,23 @@ const authController = {
             // Don't send password in response
             delete user.password;
             
+            // Try to include avatar_url if column exists
+            let userResponse;
+            try {
+                [userResponse] = await connection.query(
+                    'SELECT id, email, name, role, grade, avatar_url, created_at FROM Users WHERE id = ?',
+                    [user.id]
+                );
+            } catch (error) {
+                [userResponse] = await connection.query(
+                    'SELECT id, email, name, role, grade, created_at FROM Users WHERE id = ?',
+                    [user.id]
+                );
+            }
+            
             res.json({ 
                 message: 'Login successful',
-                user 
+                user: userResponse[0] || user
             });
         } catch (error) {
             console.error('Login error:', error);
@@ -94,10 +117,19 @@ const authController = {
                 return res.status(401).json({ error: 'Not authenticated' });
             }
             
-            const [users] = await connection.query(
-                'SELECT id, email, name, role, created_at FROM Users WHERE id = ?',
-                [userId]
-            );
+            // Try to select with avatar_url, fallback if column doesn't exist
+            let users;
+            try {
+                [users] = await connection.query(
+                    'SELECT id, email, name, role, grade, avatar_url, created_at FROM Users WHERE id = ?',
+                    [userId]
+                );
+            } catch (error) {
+                [users] = await connection.query(
+                    'SELECT id, email, name, role, grade, created_at FROM Users WHERE id = ?',
+                    [userId]
+                );
+            }
             
             if (users.length === 0) {
                 return res.status(404).json({ error: 'User not found' });

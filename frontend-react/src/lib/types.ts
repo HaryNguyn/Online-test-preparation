@@ -7,6 +7,7 @@ export interface User {
   name: string
   role: UserRole
   grade?: string
+  avatar_url?: string | null
   createdAt: string
 }
 
@@ -54,8 +55,8 @@ export interface SubmissionDTO {
   id: string
   exam_id: string
   student_id: string
-  answers: unknown
-  score: number
+  answers?: unknown
+  score?: number | null
   total_marks?: number | null
   time_taken?: number | null
   percentage?: number | null
@@ -63,6 +64,11 @@ export interface SubmissionDTO {
   exam_title?: string | null
   subject?: string | null
   grade_level?: string | null
+  grading_status?: 'pending_manual' | 'completed' | null
+  partial_scores?: string | Record<number, number> | null
+  graded_by?: string | null
+  graded_at?: string | null
+  student_name?: string | null
 }
 
 export interface Test {
@@ -82,7 +88,7 @@ export interface TestResult {
   id: string
   userId: string
   testId: string
-  answers: number[]
+  answers: Array<number | number[] | string | null>
   score: number
   totalQuestions: number
   timeTaken: number
@@ -95,4 +101,8 @@ export interface LeaderboardEntry {
   score: number
   timeTaken: number
   completedAt: string
+  percentage?: number
+  total_marks?: number
+  subject?: string
+  grade_level?: string
 }

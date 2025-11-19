@@ -3,16 +3,19 @@ import type { ReactElement } from "react"
 import { Navigate, Route, Routes } from "react-router-dom"
 import { HomePage } from "@/pages/home"
 import { LoginPage } from "@/pages/login"
-import { RegisterPage } from "@/pages/register" // This was already here
-import { ForgotPasswordPage } from "@/pages/forgot-password" // This was already here
+import { RegisterPage } from "@/pages/register" 
+import { ForgotPasswordPage } from "@/pages/forgot-password" 
 import { ChangePasswordPage } from "@/pages/change-password"
 import { TeacherPage } from "@/pages/teacher"
 import { CreateTestPage } from "@/pages/create-test"
+import TeacherGrading from "@/pages/teacher-grading"
 import { DashboardPage } from "@/pages/dashboard"
 import { TestsPage } from "@/pages/tests"
 import { TestDetailPage } from "@/pages/test-detail"
 import { ResultsPage } from "@/pages/results"
 import { ResultDetailPage } from "@/pages/result-detail"
+import { LeaderboardPage } from "@/pages/leaderboard"
+import { ProfilePage } from "@/pages/profile"
 import { AdminPage } from "@/pages/admin.tsx"
 import { useAuth } from "@/contexts/auth-context"
 import type { UserRole } from "@/lib/types"
@@ -56,6 +59,14 @@ function App() {
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} /> 
         <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <ProfilePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
           path="/change-password"
           element={
             <ProtectedRoute>
@@ -84,6 +95,14 @@ function App() {
           element={
             <ProtectedRoute roles={["teacher"]}>
               <CreateTestPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/teacher/grading"
+          element={
+            <ProtectedRoute roles={["teacher"]}>
+              <TeacherGrading />
             </ProtectedRoute>
           }
         />
@@ -124,6 +143,14 @@ function App() {
           element={
             <ProtectedRoute>
               <ResultDetailPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/leaderboard"
+          element={
+            <ProtectedRoute>
+              <LeaderboardPage />
             </ProtectedRoute>
           }
         />

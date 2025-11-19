@@ -16,7 +16,7 @@ export function ResultsPage() {
   const [results, setResults] = useState<TestResult[]>([])
   const [testsById, setTestsById] = useState<Record<string, Test>>({})
 
-  const mapSubmissionToResult = useCallback((submission: SubmissionDTO): TestResult => {
+  const mapSubmissionToResult = useCallback((submission: SubmissionDTO): TestResult & { totalMarks?: number; percentage?: number } => {
     const answersArray = Array.isArray(submission.answers)
       ? submission.answers
       : submission.answers && typeof submission.answers === "object"
@@ -41,6 +41,8 @@ export function ResultsPage() {
       totalQuestions: derivedQuestionCount,
       timeTaken: Number(submission.time_taken) || 0,
       completedAt: submission.submitted_at,
+      totalMarks: totalMarks,
+      percentage: submission.percentage ? Number(submission.percentage) : undefined,
     }
   }, [])
 
@@ -135,10 +137,24 @@ export function ResultsPage() {
   }
 
   const totalTests = results.length
-  const getResultPercentage = (result: TestResult) => {
-    const denominator = result.totalQuestions || result.answers.length
-    if (!denominator) return 0
-    return (result.score / denominator) * 100
+  const getResultPercentage = (result: TestResult & { totalMarks?: number; percentage?: number }) => {
+    // Use percentage from backend if available
+    if (result.percentage !== undefined) {
+      return Math.min(100, Math.max(0, result.percentage))
+    }
+    
+    // Calculate percentage correctly - score is marks, not count
+    if (result.totalMarks && result.totalMarks > 0) {
+      const percentage = (result.score / result.totalMarks) * 100
+      return Math.min(100, Math.max(0, percentage))
+    }
+    
+    // Fallback: assume 10 marks per question
+    const marksPerQuestion = 10
+    const totalMarks = result.totalQuestions * marksPerQuestion
+    if (!totalMarks || totalMarks === 0) return 0
+    const percentage = (result.score / totalMarks) * 100
+    return Math.min(100, Math.max(0, percentage))
   }
   const averageScore = useMemo(() => {
     if (totalTests === 0) return 0
@@ -240,30 +256,43 @@ export function ResultsPage() {
                 const test = testsById[result.testId]
                 if (!test) return null
 
-                const percentage = (result.score / result.totalQuestions) * 100
+                const resultWithExtras = result as TestResult & { totalMarks?: number; percentage?: number }
+                // Calculate percentage correctly
+                let percentage = 0
+                if (resultWithExtras.percentage !== undefined) {
+                  percentage = resultWithExtras.percentage
+                } else if (resultWithExtras.totalMarks && resultWithExtras.totalMarks > 0) {
+                  percentage = (result.score / resultWithExtras.totalMarks) * 100
+                } else {
+                  // Fallback: assume 10 marks per question
+                  const marksPerQuestion = 10
+                  const totalMarks = result.totalQuestions * marksPerQuestion
+                  percentage = totalMarks > 0 ? (result.score / totalMarks) * 100 : 0
+                }
+                percentage = Math.min(100, Math.max(0, percentage))
                 const performanceBadge = getPerformanceBadge(percentage)
 
                 return (
                   <Card key={result.id}>
                     <CardHeader>
                       <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-                        <div className="flex-1">
+                        <div className="flex-1 min-w-0">
                           <div className="mb-2 flex flex-wrap items-center gap-2">
                             <Badge variant="secondary">{test.subject}</Badge>
                             <Badge className={performanceBadge.className} variant={performanceBadge.variant}>
                               {performanceBadge.label}
                             </Badge>
                           </div>
-                          <CardTitle className="mb-1 text-xl">{test.title}</CardTitle>
+                          <CardTitle className="mb-1 text-xl break-words">{test.title}</CardTitle>
                           <CardDescription className="flex items-center gap-2">
-                            <Calendar className="h-3 w-3" />
+                            <Calendar className="h-3 w-3 flex-shrink-0" />
                             {formatDate(result.completedAt)}
                           </CardDescription>
                         </div>
-                        <div className="text-right">
+                        <div className="text-right flex-shrink-0">
                           <div className="text-3xl font-bold text-primary">{percentage.toFixed(0)}%</div>
-                          <p className="text-sm text-muted-foreground">
-                            {result.score}/{result.totalQuestions} correct
+                          <p className="text-sm text-muted-foreground whitespace-nowrap">
+                            {result.score}/{resultWithExtras.totalMarks || result.totalQuestions * 10} marks
                           </p>
                         </div>
                       </div>

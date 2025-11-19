@@ -21,7 +21,7 @@ export function TestsPage() {
   const [subjectFilter, setSubjectFilter] = useState("all")
   const [gradeFilter, setGradeFilter] = useState("all")
 
-  const mapSubmissionToResult = useCallback((submission: SubmissionDTO): TestResult => {
+  const mapSubmissionToResult = useCallback((submission: SubmissionDTO): TestResult & { totalMarks?: number; percentage?: number } => {
     const answersArray = Array.isArray(submission.answers)
       ? submission.answers
       : submission.answers && typeof submission.answers === "object"
@@ -46,6 +46,8 @@ export function TestsPage() {
       totalQuestions: derivedQuestionCount,
       timeTaken: Number(submission.time_taken) || 0,
       completedAt: submission.submitted_at,
+      totalMarks: totalMarks,
+      percentage: submission.percentage ? Number(submission.percentage) : undefined,
     }
   }, [])
 
@@ -206,13 +208,50 @@ export function TestsPage() {
                         <span>{test.grade}</span>
                       </div>
                     </div>
-                    {hasCompleted && userResult && (
-                      <div className="mb-4 rounded-lg bg-muted p-3">
-                        <p className="text-sm font-medium text-foreground">
-                          Your Score: {((userResult.score / userResult.totalQuestions) * 100).toFixed(0)}%
-                        </p>
-                      </div>
-                    )}
+                    {hasCompleted && userResult && (() => {
+                      // Calculate percentage correctly
+                      const resultWithExtras = userResult as TestResult & { totalMarks?: number; percentage?: number }
+                      let percentage = 0
+                      
+                      // Priority 1: Use percentage from backend if available and valid
+                      if (resultWithExtras.percentage !== undefined && 
+                          !Number.isNaN(resultWithExtras.percentage) && 
+                          Number.isFinite(resultWithExtras.percentage)) {
+                        percentage = resultWithExtras.percentage
+                      } 
+                      // Priority 2: Use totalMarks from test (most reliable)
+                      else if (test.totalMarks && test.totalMarks > 0) {
+                        percentage = (userResult.score / test.totalMarks) * 100
+                      }
+                      // Priority 3: Use totalMarks from result
+                      else if (resultWithExtras.totalMarks && resultWithExtras.totalMarks > 0) {
+                        percentage = (userResult.score / resultWithExtras.totalMarks) * 100
+                      }
+                      // Priority 4: Calculate from totalQuestions (assume 10 marks per question)
+                      else if (userResult.totalQuestions > 0) {
+                        const marksPerQuestion = 10
+                        const totalMarks = userResult.totalQuestions * marksPerQuestion
+                        percentage = totalMarks > 0 ? (userResult.score / totalMarks) * 100 : 0
+                      }
+                      // Fallback: can't calculate
+                      else {
+                        percentage = 0
+                      }
+                      
+                      // Ensure percentage is between 0 and 100 and is valid
+                      percentage = Math.min(100, Math.max(0, percentage))
+                      if (Number.isNaN(percentage) || !Number.isFinite(percentage)) {
+                        percentage = 0
+                      }
+                      
+                      return (
+                        <div className="mb-4 rounded-lg bg-muted p-3">
+                          <p className="text-sm font-medium text-foreground">
+                            Your Score: {percentage.toFixed(0)}%
+                          </p>
+                        </div>
+                      )
+                    })()}
                     <Button className="w-full" onClick={() => navigate(`/test/${test.id}`)}>
                       {hasCompleted ? "Retake Test" : "Start Test"}
                     </Button>

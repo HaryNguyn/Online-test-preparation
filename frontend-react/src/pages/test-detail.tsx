@@ -36,6 +36,7 @@ export function TestDetailPage() {
   const [timeRemaining, setTimeRemaining] = useState(0)
   const [isStarted, setIsStarted] = useState(false)
   const [showSubmitDialog, setShowSubmitDialog] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const [dataSource, setDataSource] = useState<"backend" | "local">("backend")
 
   useEffect(() => {
@@ -79,9 +80,10 @@ export function TestDetailPage() {
   }, [testId, navigate])
 
   const handleSubmit = useCallback(async (currentTime: number) => {
-    if (!test || !user) return
+    if (!test || !user || isSubmitting) return
 
     setShowSubmitDialog(false)
+    setIsSubmitting(true)
 
   // Auto-grade objective questions (single & multiple choice). Essays remain pending.
   let calculatedScore = 0
@@ -133,16 +135,22 @@ export function TestDetailPage() {
           percentage,
           time_taken: timeTaken,
         })
+        // Small delay to ensure submission is saved before redirect
+        await new Promise(resolve => setTimeout(resolve, 100))
         navigate(`/result/${submission.id}`, { replace: true })
         return
       } catch (error) {
         console.error("Failed to submit via API:", error)
+        setIsSubmitting(false)
+        window.alert("Could not submit test to the server. Please check your connection and try again.")
+        return
       }
     }
 
     // Fallback logic removed for clarity. The primary path is via API.
+    setIsSubmitting(false)
     window.alert("Could not submit test to the server. Please check your connection and try again.")
-  }, [answers, dataSource, navigate, test, user])
+  }, [answers, dataSource, navigate, test, user, isSubmitting])
 
   useEffect(() => {
     if (!isStarted) return
@@ -306,7 +314,9 @@ export function TestDetailPage() {
                 Question {currentQuestionIndex + 1} of {test.questions.length}
               </div>
             </div>
-            <Button onClick={() => setShowSubmitDialog(true)}>Submit Test</Button>
+            <Button onClick={() => setShowSubmitDialog(true)} disabled={isSubmitting}>
+              {isSubmitting ? "Submitting..." : "Submit Test"}
+            </Button>
           </div>
         </div>
       </div>
@@ -464,24 +474,26 @@ export function TestDetailPage() {
             <AlertDialogTitle>Submit Test?</AlertDialogTitle>
             <AlertDialogDescription>
               {answeredCount < test.questions.length ? (
-                <div className="space-y-2">
-                  <div className="flex items-start gap-2 text-destructive">
+                <>
+                  <div className="flex items-start gap-2 text-destructive mb-2">
                     <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
                     <span>
                       You have answered {answeredCount} out of {test.questions.length} questions. {" "}
                       {test.questions.length - answeredCount} questions are unanswered.
                     </span>
                   </div>
-                  <p className="text-foreground">Are you sure you want to submit?</p>
-                </div>
+                  <span className="text-foreground">Are you sure you want to submit?</span>
+                </>
               ) : (
-                <p>You have answered all questions. Are you sure you want to submit your test?</p>
+                "You have answered all questions. Are you sure you want to submit your test?"
               )}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Review Answers</AlertDialogCancel> 
-            <AlertDialogAction onClick={() => handleSubmit(timeRemaining)}>Submit Test</AlertDialogAction>
+            <AlertDialogCancel disabled={isSubmitting}>Review Answers</AlertDialogCancel> 
+            <AlertDialogAction onClick={() => handleSubmit(timeRemaining)} disabled={isSubmitting}>
+              {isSubmitting ? "Submitting..." : "Submit Test"}
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

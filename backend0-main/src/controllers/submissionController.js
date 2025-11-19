@@ -204,7 +204,8 @@ const submissionController = {
     // Get pending submissions (for teacher manual grading)
     getPendingSubmissions: async (req, res) => {
         try {
-            const { examId } = req.query;
+            const { exam_id, examId } = req.query;
+            const examIdValue = exam_id || examId;
             
             let query = `SELECT s.*, e.title as exam_title, e.subject, u.name as student_name, u.email as student_email 
                 FROM Submissions s 
@@ -213,9 +214,9 @@ const submissionController = {
                 WHERE s.grading_status = 'pending_manual'`;
             
             const params = [];
-            if (examId) {
+            if (examIdValue) {
                 query += ' AND s.exam_id = ?';
-                params.push(examId);
+                params.push(examIdValue);
             }
             
             query += ' ORDER BY s.submitted_at DESC';
@@ -321,7 +322,7 @@ const submissionController = {
             // Update submission with final score and grading status
             await connection.query(
                 `UPDATE Submissions 
-                SET score = ?, percentage = ?, grading_status = 'graded', 
+                SET score = ?, percentage = ?, grading_status = 'manually_graded', 
                     graded_by = ?, graded_at = NOW(), partial_scores = ? 
                 WHERE id = ?`,
                 [totalScore, finalPercentage, graded_by, JSON.stringify(essay_scores), id]

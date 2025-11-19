@@ -1,6 +1,6 @@
 import { useAuth } from "@/contexts/auth-context.tsx"
 import { Button } from "@/components/ui/button"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,7 +9,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { LogOut, KeyRound } from "lucide-react"
+import { LogOut, KeyRound, User } from "lucide-react"
 import { Link, useNavigate } from "react-router-dom"
 
 export function DashboardHeader() {
@@ -49,6 +49,9 @@ export function DashboardHeader() {
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="relative h-10 w-10 rounded-full">
                 <Avatar>
+                  {user?.avatar_url ? (
+                    <AvatarImage src={user.avatar_url} alt={user.name} />
+                  ) : null}
                   <AvatarFallback className="bg-primary text-primary-foreground">
                     {user ? getInitials(user.name) : "U"}
                   </AvatarFallback>
@@ -67,6 +70,12 @@ export function DashboardHeader() {
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
+              <DropdownMenuItem asChild>
+                <Link to="/profile" className="flex items-center cursor-pointer">
+                  <User className="mr-2 h-4 w-4" />
+                  <span>Profile Settings</span>
+                </Link>
+              </DropdownMenuItem>
               <DropdownMenuItem asChild>
                 <Link to="/change-password" className="flex items-center cursor-pointer">
                   <KeyRound className="mr-2 h-4 w-4" />
