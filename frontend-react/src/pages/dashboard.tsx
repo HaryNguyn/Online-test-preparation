@@ -102,41 +102,41 @@ export function DashboardPage() {
 
       <main className="container mx-auto px-4 py-8 pt-24">
         <div className="mb-8">
-          <h1 className="mb-2 text-3xl font-bold text-foreground">Welcome back, {user.name}!</h1>
-          <p className="text-muted-foreground">Track your progress and continue your learning journey</p>
+          <h1 className="mb-2 text-3xl font-bold text-foreground">Chào Mừng, {user.name}!</h1>
+          <p className="text-muted-foreground">Luyện tập để cùng đạt kết quả cáo nhé ^.^</p>
         </div>
 
         <div className="mb-8 grid gap-4 md:grid-cols-3">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Tests Taken</CardTitle>
+              <CardTitle className="text-sm font-medium">Số bài kiểm tra</CardTitle>
               <BookOpen className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{stats.totalTestsTaken}</div>
-              <p className="text-xs text-muted-foreground">Total completed tests</p>
+              <p className="text-xs text-muted-foreground">đã làm</p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Average Score</CardTitle>
+              <CardTitle className="text-sm font-medium">Điểm trung bình</CardTitle>
               <TrendingUp className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{stats.averageScore}%</div>
-              <p className="text-xs text-muted-foreground">Across all tests</p>
+              <p className="text-xs text-muted-foreground">Trung bình tất cả các bài kiểm tra</p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Best Score</CardTitle>
+              <CardTitle className="text-sm font-medium">Điểm cao nhất</CardTitle>
               <Trophy className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{stats.bestScore.toFixed(0)}%</div>
-              <p className="text-xs text-muted-foreground">Your highest score</p>
+              <p className="text-xs text-muted-foreground">Điểm cao nhất của bạn</p>
             </CardContent>
           </Card>
         </div>
@@ -145,26 +145,26 @@ export function DashboardPage() {
           <Button asChild>
             <Link to="/tests">
               <BookOpen className="mr-2 h-4 w-4" />
-              Browse All Tests
+              Bài kiểm tra
             </Link>
           </Button>
           <Button asChild variant="outline">
             <Link to="/leaderboard">
               <Trophy className="mr-2 h-4 w-4" />
-              View Leaderboard
+              Bảng xếp hạng
             </Link>
           </Button>
           <Button asChild variant="outline">
             <Link to="/results">
               <TrendingUp className="mr-2 h-4 w-4" />
-              My Results
+              Kết quả của tôi
             </Link>
           </Button>
         </div>
 
         <div>
           <div className="mb-6 flex items-center justify-between">
-            <h2 className="text-2xl font-bold text-foreground">Available Tests</h2>
+            <h2 className="text-2xl font-bold text-foreground">Bài kiểm tra hiện có</h2>
             <Badge variant="secondary">{filteredTests.length} tests</Badge>
           </div>
 
@@ -184,7 +184,7 @@ export function DashboardPage() {
                 <SelectValue placeholder="Subject" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Subjects</SelectItem>
+                <SelectItem value="all">Môn học</SelectItem>
                 {subjects.map((subject) => (
                   <SelectItem key={subject} value={subject}>
                     {subject}
@@ -197,7 +197,7 @@ export function DashboardPage() {
                 <SelectValue placeholder="Grade" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Grades</SelectItem>
+                <SelectItem value="all">Tất cả các lớp</SelectItem>
                 {grades.map((grade) => (
                   <SelectItem key={grade} value={grade}>
                     {grade}
@@ -211,8 +211,8 @@ export function DashboardPage() {
             <Card>
               <CardContent className="flex flex-col items-center justify-center py-12">
                 <BookOpen className="mb-4 h-12 w-12 text-muted-foreground" />
-                <p className="text-lg font-medium text-foreground">No tests found</p>
-                <p className="text-sm text-muted-foreground">Try adjusting your filters</p>
+                <p className="text-lg font-medium text-foreground">Không tìm thấy bài kiểm tra</p>
+                <p className="text-sm text-muted-foreground">Thử điều chỉnh bộ lọc của bạn</p>
               </CardContent>
             </Card>
           ) : (
@@ -226,7 +226,7 @@ export function DashboardPage() {
                     <CardHeader>
                       <div className="mb-2 flex items-start justify-between">
                         <Badge variant="secondary">{test.subject}</Badge>
-                        {hasCompleted && <Badge className="bg-success text-success-foreground">Completed</Badge>}
+                        {hasCompleted && <Badge className="bg-success text-success-foreground">hoàn thành</Badge>}
                       </div>
                       <CardTitle className="text-lg">{test.title}</CardTitle>
                       <CardDescription className="line-clamp-2">{test.description}</CardDescription>
@@ -239,7 +239,7 @@ export function DashboardPage() {
                         </div>
                         <div className="flex items-center gap-2">
                           <BookOpen className="h-4 w-4" />
-                          <span>{test.questions.length} questions</span>
+                          <span>{test.questions.length} câu hỏi</span>
                         </div>
                         <div className="flex items-center gap-2">
                           <Trophy className="h-4 w-4" />

@@ -2,6 +2,7 @@
 USE harringuyn;
 
 -- Drop existing tables to avoid FK conflicts
+DROP TABLE IF EXISTS Videos;
 DROP TABLE IF EXISTS Leaderboard;
 DROP TABLE IF EXISTS Submissions;
 DROP TABLE IF EXISTS Questions;
@@ -16,6 +17,8 @@ CREATE TABLE IF NOT EXISTS Users (
     password VARCHAR(255) NOT NULL,
     name VARCHAR(255) NOT NULL,
     role ENUM('student', 'teacher', 'admin', 'parent') NOT NULL,
+    grade VARCHAR(50) DEFAULT NULL,
+    avatar_url VARCHAR(500) DEFAULT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (id),
@@ -112,6 +115,27 @@ CREATE TABLE IF NOT EXISTS Leaderboard (
     KEY idx_leaderboard_student (student_id),
     CONSTRAINT fk_leaderboard_exam FOREIGN KEY (exam_id) REFERENCES Exams(id) ON DELETE CASCADE,
     CONSTRAINT fk_leaderboard_user FOREIGN KEY (student_id) REFERENCES Users(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Create Videos table for YouTube learning videos
+CREATE TABLE IF NOT EXISTS Videos (
+    id VARCHAR(36) NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    description TEXT,
+    youtube_url VARCHAR(500) NOT NULL,
+    youtube_id VARCHAR(20) NOT NULL COMMENT 'YouTube video ID extracted from URL',
+    subject VARCHAR(100),
+    grade_level VARCHAR(50),
+    duration INT NULL COMMENT 'Video duration in seconds',
+    thumbnail_url VARCHAR(500) NULL,
+    created_by VARCHAR(36) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    KEY idx_videos_subject (subject),
+    KEY idx_videos_grade (grade_level),
+    KEY idx_videos_creator (created_by),
+    CONSTRAINT fk_videos_user FOREIGN KEY (created_by) REFERENCES Users(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ===========================

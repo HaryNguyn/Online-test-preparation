@@ -80,7 +80,10 @@ export function ResultDetailPage() {
 
         const { exam } = await api.getExam(submission.exam_id)
         const mappedTest = mapExamToTest(exam)
+        console.log(' Raw submission.answers in result-detail:', submission.answers)
+        console.log(' Exam questions:', exam.questions?.length)
         const normalizedAnswers = normalizeAnswers(submission.answers, exam.questions || [])
+        console.log(' Normalized answers in result-detail:', normalizedAnswers)
         const mappedResult = mapSubmissionToResult(submission, normalizedAnswers)
 
         if (mounted) {

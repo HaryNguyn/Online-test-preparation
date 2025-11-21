@@ -5,6 +5,7 @@ const examController = require('../controllers/examController');
 const submissionController = require('../controllers/submissionController');
 const leaderboardController = require('../controllers/leaderboardController');
 const userMappingController = require('../controllers/userMappingController');
+const videoController = require('../controllers/videoController');
 const { upload, uploadController } = require('../controllers/uploadController');
 
 // Auth routes
@@ -28,6 +29,7 @@ router.get('/submissions/exam/:examId', submissionController.getExamSubmissions)
 router.get('/submissions/pending', submissionController.getPendingSubmissions);
 router.get('/submissions/:id', submissionController.getSubmissionById);
 router.put('/submissions/:id/grade', submissionController.gradeSubmission);
+router.delete('/submissions/:id', submissionController.deleteSubmission);
 
 // Leaderboard routes
 router.get('/leaderboard/exam/:examId', leaderboardController.getExamLeaderboard);
@@ -36,6 +38,13 @@ router.get('/leaderboard/student/:studentId/rank', leaderboardController.getStud
 
 // User mapping routes
 router.get('/user-mapping/resolve', userMappingController.resolveUserId);
+
+// Video routes
+router.get('/videos', videoController.getAllVideos);
+router.get('/videos/:id', videoController.getVideoById);
+router.post('/videos', videoController.createVideo);
+router.put('/videos/:id', videoController.updateVideo);
+router.delete('/videos/:id', videoController.deleteVideo);
 
 // Thêm route mới để xử lý upload file
 router.post('/upload', upload.single('file'), uploadController.uploadFile);

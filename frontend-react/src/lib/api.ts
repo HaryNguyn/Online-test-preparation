@@ -124,6 +124,31 @@ export const api = {
       body: JSON.stringify(payload),
     }),
 
+  deleteSubmission: (id: string) =>
+    request<{ message: string }>(`/submissions/${id}`, { method: "DELETE" }),
+
+  // Video APIs
+  getVideos: (params?: { subject?: string; grade_level?: string; created_by?: string }) => {
+    const qs = new URLSearchParams()
+    if (params) {
+      Object.entries(params).forEach(([key, value]) => {
+        if (value) qs.append(key, value)
+      })
+    }
+    const suffix = qs.toString() ? `?${qs.toString()}` : ""
+    return request<{ videos: import("./types").VideoDTO[] }>(`/videos${suffix}`)
+  },
+
+  getVideo: (id: string) => request<{ video: import("./types").VideoDTO }>(`/videos/${id}`),
+
+  createVideo: (payload: Partial<import("./types").VideoDTO>) =>
+    request<{ video: import("./types").VideoDTO }>(`/videos`, { method: "POST", body: JSON.stringify(payload) }),
+
+  updateVideo: (id: string, payload: Partial<import("./types").VideoDTO>) =>
+    request<{ message: string }>(`/videos/${id}`, { method: "PUT", body: JSON.stringify(payload) }),
+
+  deleteVideo: (id: string) => request<{ message: string }>(`/videos/${id}`, { method: "DELETE" }),
+
   getExamLeaderboard: (examId: string, limit = 10) =>
     request<{ leaderboard: LeaderboardEntry[] }>(`/leaderboard/exam/${examId}?limit=${limit}`),
 

@@ -126,6 +126,9 @@ export function TestDetailPage() {
 
     if (dataSource === "backend") {
       try {
+        console.log('📤 Submitting answers:', answers)
+        console.log('📊 Answer types:', answers.map((a, i) => ({ index: i, type: typeof a, value: a })))
+        
         const { submission } = await api.createSubmission({
           exam_id: test.id,
           student_id: user.id,
@@ -135,6 +138,8 @@ export function TestDetailPage() {
           percentage,
           time_taken: timeTaken,
         })
+        
+        console.log('✅ Submission response:', submission)
         // Small delay to ensure submission is saved before redirect
         await new Promise(resolve => setTimeout(resolve, 100))
         navigate(`/result/${submission.id}`, { replace: true })
@@ -392,7 +397,13 @@ export function TestDetailPage() {
                   <div className="space-y-3">
                     {currentQuestion.options.map((option, index) => (
                       <label key={index} className={`flex items-center space-x-3 rounded-lg border p-4 transition-colors cursor-pointer ${Array.isArray(answers[currentQuestionIndex]) && (answers[currentQuestionIndex] as number[]).includes(index) ? 'border-primary bg-primary/5' : 'border-border hover:bg-muted/50'}`}>
-                        <input type="checkbox" checked={Array.isArray(answers[currentQuestionIndex]) && (answers[currentQuestionIndex] as number[]).includes(index)} onChange={() => handleMultiToggle(currentQuestionIndex, index)} />
+                        <input 
+                          type="checkbox" 
+                          id={`multi-${currentQuestionIndex}-${index}`}
+                          name={`multi-${currentQuestionIndex}`}
+                          checked={Array.isArray(answers[currentQuestionIndex]) && (answers[currentQuestionIndex] as number[]).includes(index)} 
+                          onChange={() => handleMultiToggle(currentQuestionIndex, index)} 
+                        />
                         <span className="flex-1 text-base">{option}</span>
                       </label>
                     ))}
@@ -401,7 +412,14 @@ export function TestDetailPage() {
 
                 {currentQuestion.questionType === 'essay' && (
                   <div className="space-y-2">
-                    <Textarea value={(answers[currentQuestionIndex] as string) || ""} onChange={(e: any) => handleEssayChange(currentQuestionIndex, e.target.value)} placeholder="Write your essay answer here..." />
+                    <Textarea 
+                      id={`essay-${currentQuestionIndex}`}
+                      name={`essay-${currentQuestionIndex}`}
+                      value={(answers[currentQuestionIndex] as string) || ""} 
+                      onChange={(e: any) => handleEssayChange(currentQuestionIndex, e.target.value)} 
+                      placeholder="Write your essay answer here..." 
+                      className="min-h-[200px]"
+                    />
                     <p className="text-sm text-muted-foreground">This answer will be graded manually by a teacher.</p>
                   </div>
                 )}

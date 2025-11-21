@@ -8,13 +8,54 @@ import { Badge } from "@/components/ui/badge"
 import { api } from "@/lib/api"
 import { storage } from "@/lib/storage"
 import type { SubmissionDTO, Test, TestResult } from "@/lib/types"
-import { Trophy, Clock, BookOpen, TrendingUp, ArrowLeft, Calendar } from "lucide-react"
+import { Trophy, Clock, BookOpen, TrendingUp, ArrowLeft, Calendar, Trash2 } from "lucide-react"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
+import { toast } from "@/hooks/use-toast"
 
 export function ResultsPage() {
   const { user, isLoading } = useAuth()
   const navigate = useNavigate()
   const [results, setResults] = useState<TestResult[]>([])
   const [testsById, setTestsById] = useState<Record<string, Test>>({})
+  const [deletingId, setDeletingId] = useState<string | null>(null)
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false)
+
+  const handleDeleteClick = (resultId: string) => {
+    setDeletingId(resultId)
+    setShowDeleteDialog(true)
+  }
+
+  const handleDeleteConfirm = async () => {
+    if (!deletingId) return
+
+    try {
+      await api.deleteSubmission(deletingId)
+      setResults(prev => prev.filter(r => r.id !== deletingId))
+      toast({
+        title: "Success",
+        description: "Submission deleted successfully",
+      })
+    } catch (error) {
+      console.error("Failed to delete submission:", error)
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to delete submission",
+        variant: "destructive",
+      })
+    } finally {
+      setShowDeleteDialog(false)
+      setDeletingId(null)
+    }
+  }
 
   const mapSubmissionToResult = useCallback((submission: SubmissionDTO): TestResult & { totalMarks?: number; percentage?: number } => {
     const answersArray = Array.isArray(submission.answers)
@@ -316,6 +357,14 @@ export function ResultsPage() {
                           <Button size="sm" onClick={() => navigate(`/test/${test.id}`)}>
                             Retake
                           </Button>
+                          <Button 
+                            variant="ghost" 
+                            size="sm"
+                            className="text-destructive hover:text-destructive"
+                            onClick={() => handleDeleteClick(result.id)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
                         </div>
                       </div>
                     </CardContent>
@@ -326,6 +375,23 @@ export function ResultsPage() {
           )}
         </div>
       </main>
+
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Submission?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this submission? This action cannot be undone and will remove your result from the leaderboard.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteConfirm} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }

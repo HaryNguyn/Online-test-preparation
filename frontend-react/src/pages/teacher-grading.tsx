@@ -76,7 +76,10 @@ export default function TeacherGrading() {
       const questionList = examData.questions || []
       setQuestions(questionList)
 
+      console.log('🔍 Raw submission.answers:', sub.answers)
+      console.log('📋 Questions count:', questionList.length)
       const normalized = normalizeAnswers(sub.answers, questionList)
+      console.log('✅ Normalized answers:', normalized)
       setStudentAnswers(normalized)
 
       // Initialize essay scores with current partial scores if exists
@@ -194,6 +197,9 @@ export default function TeacherGrading() {
 
   const essayQuestions = questions.filter((q) => q.question_type === "essay")
   console.log("Essay questions found:", essayQuestions.length)
+  console.log(" All questions:", questions.map((q, i) => ({ idx: i, type: q.question_type, text: q.question_text?.substring(0, 50) })))
+  console.log(" Student answers array:", studentAnswers)
+  console.log(" Student answers detail:", studentAnswers.map((a, i) => ({ idx: i, type: typeof a, value: typeof a === 'string' ? a.substring(0, 100) : a })))
 
   return (
     <div className="min-h-screen bg-background">
@@ -261,6 +267,12 @@ export default function TeacherGrading() {
               if (question.question_type !== "essay") return null
 
               const studentAnswer = studentAnswers[idx]
+              console.log(` Question ${idx + 1} (essay):`, {
+                questionText: question.question_text?.substring(0, 50),
+                answerType: typeof studentAnswer,
+                answerValue: typeof studentAnswer === 'string' ? studentAnswer.substring(0, 100) : studentAnswer,
+                answerLength: typeof studentAnswer === 'string' ? studentAnswer.length : 'N/A'
+              })
               const maxMarks = question.marks ?? 10
               const currentScore = essayScores[idx]
 
@@ -274,7 +286,7 @@ export default function TeacherGrading() {
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div>
-                      <Label className="text-base font-semibold mb-2 block">Student's Answer:</Label>
+                      <p className="text-base font-semibold mb-2">Student's Answer:</p>
                       <div className="bg-muted p-4 rounded-md min-h-[100px] whitespace-pre-wrap">
                         {studentAnswer && String(studentAnswer).trim() ? (
                           String(studentAnswer)
@@ -293,6 +305,7 @@ export default function TeacherGrading() {
                       <div className="flex gap-2 items-center">
                         <Input
                           id={`score-${idx}`}
+                          name={`score-${idx}`}
                           type="number"
                           min="0"
                           max={maxMarks}

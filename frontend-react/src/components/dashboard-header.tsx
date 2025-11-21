@@ -9,12 +9,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { LogOut, KeyRound, User } from "lucide-react"
-import { Link, useNavigate } from "react-router-dom"
+import { LogOut, KeyRound, User, Video, ArrowLeft } from "lucide-react"
+import { Link, useNavigate, useLocation } from "react-router-dom"
 
 export function DashboardHeader() {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
+  const location = useLocation()
 
   const handleLogout = () => {
     logout()
@@ -36,6 +37,8 @@ export function DashboardHeader() {
     return "/dashboard"
   }
 
+  const showBackButton = user?.role === "student" && location.pathname === "/videos"
+
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-card">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
@@ -45,6 +48,20 @@ export function DashboardHeader() {
         </Link>
 
         <div className="flex items-center gap-4">
+          {showBackButton && (
+            <Button variant="ghost" size="sm" onClick={() => navigate("/dashboard")}>
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Quay lại 
+            </Button>
+          )}
+          {user?.role === "student" && !showBackButton && (
+            <Link to="/videos">
+              <Button variant="ghost" size="sm">
+                <Video className="mr-2 h-4 w-4" />
+                 Khóa học
+              </Button>
+            </Link>
+          )}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="relative h-10 w-10 rounded-full">
@@ -73,19 +90,19 @@ export function DashboardHeader() {
               <DropdownMenuItem asChild>
                 <Link to="/profile" className="flex items-center cursor-pointer">
                   <User className="mr-2 h-4 w-4" />
-                  <span>Profile Settings</span>
+                  <span>Chỉnh sửa tài khoản</span>
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
                 <Link to="/change-password" className="flex items-center cursor-pointer">
                   <KeyRound className="mr-2 h-4 w-4" />
-                  <span>Change Password</span>
+                  <span>Đổi mật khẩu</span>
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={handleLogout} className="text-destructive">
                 <LogOut className="mr-2 h-4 w-4" />
-                <span>Log out</span>
+                <span>Đăng xuất</span>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

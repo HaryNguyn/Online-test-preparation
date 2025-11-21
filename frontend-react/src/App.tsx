@@ -9,7 +9,9 @@ import { ChangePasswordPage } from "@/pages/change-password"
 import { TeacherPage } from "@/pages/teacher"
 import { CreateTestPage } from "@/pages/create-test"
 import TeacherGrading from "@/pages/teacher-grading"
+import TeacherVideos from "@/pages/teacher-videos"
 import { DashboardPage } from "@/pages/dashboard"
+import VideosPage from "@/pages/videos"
 import { TestsPage } from "@/pages/tests"
 import { TestDetailPage } from "@/pages/test-detail"
 import { ResultsPage } from "@/pages/results"
@@ -107,10 +109,26 @@ function App() {
           }
         />
         <Route
+          path="/teacher/videos"
+          element={
+            <ProtectedRoute roles={["teacher"]}>
+              <TeacherVideos />
+            </ProtectedRoute>
+          }
+        />
+        <Route
           path="/dashboard"
           element={
             <ProtectedRoute>
               <DashboardPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/videos"
+          element={
+            <ProtectedRoute>
+              <VideosPage />
             </ProtectedRoute>
           }
         />

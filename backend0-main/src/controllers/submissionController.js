@@ -6,6 +6,9 @@ const submissionController = {
         try {
             const { exam_id, student_id, answers, score, total_marks, percentage, time_taken } = req.body;
 
+            console.log('📥 Received submission - answers:', answers);
+            console.log('📊 Answer types:', Array.isArray(answers) ? answers.map((a, i) => ({ index: i, type: typeof a, value: a })) : 'Not an array');
+
             if (!exam_id || !student_id || !answers) {
                 return res.status(400).json({ error: 'Required fields are missing' });
             }
@@ -80,9 +83,13 @@ const submissionController = {
             const submissionId = uuidv4();
 
             // Insert submission
+            const answersJson = JSON.stringify(answers);
+            console.log('💾 Storing answers as JSON:', answersJson);
+            console.log('📌 Grading status:', gradingStatus, 'Score:', finalScore);
+            
             await connection.query(
                 'INSERT INTO Submissions (id, exam_id, student_id, answers, score, total_marks, percentage, time_taken, grading_status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
-                [submissionId, exam_id, student_id, JSON.stringify(answers), finalScore, total_marks, finalPercentage, time_taken, gradingStatus]
+                [submissionId, exam_id, student_id, answersJson, finalScore, total_marks, finalPercentage, time_taken, gradingStatus]
             );
 
             // Insert into leaderboard only if fully graded
@@ -186,14 +193,24 @@ const submissionController = {
             }
             
             const submission = submissions[0];
+            console.log('📤 Raw submission.answers from DB:', submission.answers, 'Type:', typeof submission.answers);
+            
             if (submission.answers) {
-                try {
-                    submission.answers = JSON.parse(submission.answers);
-                } catch (e) {
-                    submission.answers = {};
+                // MySQL may already parse JSON columns, check type first
+                if (typeof submission.answers === 'string') {
+                    try {
+                        submission.answers = JSON.parse(submission.answers);
+                        console.log('🔄 Parsed answers from string:', submission.answers);
+                    } catch (e) {
+                        console.error('❌ Failed to parse answers:', e);
+                        submission.answers = {};
+                    }
+                } else {
+                    console.log('✅ Answers already parsed by MySQL driver');
                 }
             }
             
+            //console.log('📤 Sending submission with answers:', submission.answers);
             res.json({ submission });
         } catch (error) {
             console.error('Get submission error:', error);
@@ -362,6 +379,35 @@ const submissionController = {
         } catch (error) {
             console.error('Grade submission error:', error);
             res.status(500).json({ error: 'Failed to grade submission' });
+        }
+    },
+
+    // Delete submission
+    deleteSubmission: async (req, res) => {
+        try {
+            const { id } = req.params;
+
+            // Check if submission exists
+            const [submissions] = await connection.query('SELECT * FROM Submissions WHERE id = ?', [id]);
+            if (submissions.length === 0) {
+                return res.status(404).json({ error: 'Submission not found' });
+            }
+
+            const submission = submissions[0];
+
+            // Delete from leaderboard if exists
+            await connection.query(
+                'DELETE FROM Leaderboard WHERE exam_id = ? AND student_id = ?',
+                [submission.exam_id, submission.student_id]
+            );
+
+            // Delete submission
+            await connection.query('DELETE FROM Submissions WHERE id = ?', [id]);
+
+            res.json({ message: 'Submission deleted successfully' });
+        } catch (error) {
+            console.error('Delete submission error:', error);
+            res.status(500).json({ error: 'Failed to delete submission' });
         }
     }
 };

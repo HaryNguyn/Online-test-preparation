@@ -64,7 +64,7 @@ export interface SubmissionDTO {
   exam_title?: string | null
   subject?: string | null
   grade_level?: string | null
-  grading_status?: 'pending_manual' | 'completed' | null
+  grading_status?: 'pending_manual' | 'manually_graded' | 'auto_graded' | 'completed' | null
   partial_scores?: string | Record<number, number> | null
   graded_by?: string | null
   graded_at?: string | null
@@ -105,4 +105,20 @@ export interface LeaderboardEntry {
   total_marks?: number
   subject?: string
   grade_level?: string
+}
+
+export interface VideoDTO {
+  id: string
+  title: string
+  description?: string | null
+  youtube_url: string
+  youtube_id: string
+  subject?: string | null
+  grade_level?: string | null
+  duration?: number | null
+  thumbnail_url?: string | null
+  created_by: string
+  creator_name?: string | null
+  created_at: string
+  updated_at: string
 }
