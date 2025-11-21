@@ -1,0 +1,26 @@
+# Flutter SDK (không nên commit vào Git)
+flutter/
+
+# Node modules
+backend0-main/node_modules/
+frontend-react/node_modules/
+
+# Build outputs
+frontend-flutter/build/
+frontend-react/dist/
+backend0-main/public/uploads/*
+!backend0-main/public/uploads/.gitkeep
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.local

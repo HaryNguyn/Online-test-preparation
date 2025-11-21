@@ -24,7 +24,8 @@ if (process.env.FRONTEND_URL) {
 
 app.use(cors({
     origin(origin, callback) {
-        if (!origin || allowedOrigins.has(origin)) {
+        // In development, allow all localhost origins
+        if (!origin || allowedOrigins.has(origin) || (origin && origin.startsWith('http://localhost'))) {
             return callback(null, true);
         }
         return callback(new Error(`Origin ${origin} not allowed by CORS`));
@@ -61,7 +62,7 @@ app.use(express.static('public'));
 // );
 
 app.listen(port, () => {
-    console.log(`🚀 Backend server running on http://${hostname}:${port}`);
-    console.log(`📊 API available at http://${hostname}:${port}/api`);
-    console.log(`🌐 Web routes at http://${hostname}:${port}`);
+    console.log(` Backend server running on http://${hostname}:${port}`);
+    console.log(` API available at http://${hostname}:${port}/api`);
+    console.log(` Web routes at http://${hostname}:${port}`);
 });
