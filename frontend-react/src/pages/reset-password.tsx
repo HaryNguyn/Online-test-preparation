@@ -24,11 +24,11 @@ export function ResetPasswordPage() {
     setSuccess("")
 
     if (password !== confirmPassword) {
-      setError("Passwords do not match.")
+      setError("Mật khẩu không khớp.")
       return
     }
     if (password.length < 6) {
-      setError("Password must be at least 6 characters long.")
+      setError("Mật khẩu phải có ít nhất 6 ký tự.")
       return
     }
 
@@ -37,10 +37,10 @@ export function ResetPasswordPage() {
     const result = await confirmResetPassword(token!, password)
 
     if (result.success) {
-      setSuccess("Your password has been reset successfully. Redirecting to sign in...")
+      setSuccess("Mật khẩu của bạn đã được đặt lại thành công. Đang chuyển hướng đến trang đăng nhập...")
       setTimeout(() => navigate("/login", { replace: true }), 3000)
     } else {
-      setError(result.error ?? "Failed to reset password. The link may be invalid or expired.")
+      setError(result.error ?? "Không thể đặt lại mật khẩu. Liên kết có thể không hợp lệ hoặc đã hết hạn.")
     }
 
     setIsLoading(false)
@@ -55,8 +55,8 @@ export function ResetPasswordPage() {
 
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle className="text-2xl">Reset Your Password</CardTitle>
-          <CardDescription>Enter your new password below.</CardDescription>
+          <CardTitle className="text-2xl">Đặt lại mật khẩu</CardTitle>
+          <CardDescription>Nhập mật khẩu mới của bạn bên dưới.</CardDescription>
         </CardHeader>
         <CardContent>
           {success ? (
@@ -74,16 +74,16 @@ export function ResetPasswordPage() {
               )}
 
               <div className="space-y-2">
-                <Label htmlFor="password">New Password</Label>
+                <Label htmlFor="password">Mật khẩu mới</Label>
                 <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={6} />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="confirm-password">Confirm New Password</Label>
+                <Label htmlFor="confirm-password">Xác nhận mật khẩu mới</Label>
                 <Input id="confirm-password" type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required />
               </div>
 
               <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? "Resetting..." : "Reset Password"}
+                {isLoading ? "Đang đặt lại..." : "Đặt lại mật khẩu"}
               </Button>
             </form>
           )}

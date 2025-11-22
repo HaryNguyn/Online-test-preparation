@@ -16,7 +16,7 @@ export function ForgotPasswordPage() {
   const [success, setSuccess] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
-  const { changePassword } = useAuth()
+  const { forgotPassword } = useAuth()
   const navigate = useNavigate()
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -38,12 +38,12 @@ export function ForgotPasswordPage() {
       return
     }
 
-    const result = await changePassword(email, newPassword)
+    const result = await forgotPassword(email, newPassword)
 
     if (result.success) {
-      setSuccess("Your password has been changed successfully. You can now sign in with your new password.")
+      setSuccess("Mật khẩu của bạn đã được thay đổi thành công. Bạn có thể đăng nhập bằng mật khẩu mới.")
     } else {
-      setError(result.error ?? "Failed to change password. Please check your email and try again.")
+      setError(result.error ?? "Không thể thay đổi mật khẩu. Vui lòng kiểm tra email và thử lại.")
     }
 
     setIsLoading(false)
@@ -52,14 +52,14 @@ export function ForgotPasswordPage() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-muted/30 px-4">
       <div className="mb-8 flex items-center gap-2">
-        <img src="/hnue-logo.png" alt="HNUE Logo" className="h-8 w-8" width={32} height={32} />
+        <img src="src/public/hnue-logo.png" alt="HNUE Logo" className="h-8 w-8" width={32} height={32} />
         <span className="text-2xl font-semibold text-foreground">ExamPrep</span>
       </div>
 
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle className="text-2xl">Reset Password</CardTitle>
-          <CardDescription>Enter your email and a new password to reset your account.</CardDescription>
+          <CardTitle className="text-2xl">Đặt lại mật khẩu</CardTitle>
+          <CardDescription>Nhập email và mật khẩu mới để đặt lại tài khoản của bạn.</CardDescription>
         </CardHeader>
         <CardContent>
           {success ? (
@@ -88,7 +88,7 @@ export function ForgotPasswordPage() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="new-password">New Password</Label>
+                <Label htmlFor="new-password">Mật khẩu mới</Label>
                 <div className="relative">
                   <Input id="new-password" type={showPassword ? "text" : "password"} value={newPassword} onChange={(e) => setNewPassword(e.target.value)} required minLength={8} className="pr-10" />
                   <Button type="button" variant="ghost" size="sm" className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent" onClick={() => setShowPassword((prev) => !prev)}>
@@ -97,7 +97,7 @@ export function ForgotPasswordPage() {
                 </div>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="confirm-password">Confirm New Password</Label>
+                <Label htmlFor="confirm-password">Xác nhận mật khẩu mới</Label>
                 <div className="relative">
                   <Input id="confirm-password" type={showPassword ? "text" : "password"} value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required className="pr-10" />
                   <Button type="button" variant="ghost" size="sm" className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent" onClick={() => setShowPassword((prev) => !prev)}>
@@ -111,7 +111,7 @@ export function ForgotPasswordPage() {
               <div className="text-center">
                 <Button variant="outline" className="w-full">
                   <ArrowLeft className="mr-2 h-4 w-4" />
-                  Back to Sign In page
+                  Quay lại trang đăng nhập
                 </Button>
               </div>
             </form>

@@ -1,10 +1,11 @@
 import { useState, type FormEvent } from "react"
+import { useNavigate } from "react-router-dom"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { AlertCircle, CheckCircle2, Eye, EyeOff } from "lucide-react"
+import { AlertCircle, CheckCircle2, Eye, EyeOff, ArrowLeft } from "lucide-react"
 import { useAuth } from "@/contexts/auth-context"
 import { DashboardHeader } from "@/components/dashboard-header"
 
@@ -17,6 +18,7 @@ export function ChangePasswordPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const { changePassword } = useAuth()
+  const navigate = useNavigate()
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -30,7 +32,7 @@ export function ChangePasswordPage() {
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/
     if (!passwordRegex.test(newPassword)) {
       setError(
-        "Password must be at least 8 characters, and include an uppercase letter, a lowercase letter, a number, and a special character.",
+        "Mật khẩu phải có ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt.",
       )
       return
     }
@@ -40,12 +42,12 @@ export function ChangePasswordPage() {
     const result = await changePassword(currentPassword, newPassword)
 
     if (result.success) {
-      setSuccess("Your password has been changed successfully.")
+      setSuccess("Mật khẩu của bạn đã được thay đổi thành công.")
       setCurrentPassword("")
       setNewPassword("")
       setConfirmPassword("")
     } else {
-      setError(result.error ?? "Failed to change password. Please check your current password.")
+      setError(result.error ?? "Không thể đổi mật khẩu. Vui lòng kiểm tra lại mật khẩu hiện tại.")
     }
 
     setIsLoading(false)
@@ -57,8 +59,8 @@ export function ChangePasswordPage() {
       <main className="container mx-auto flex items-center justify-center px-4 py-8">
         <Card className="w-full max-w-md">
           <CardHeader>
-            <CardTitle className="text-2xl">Change Password</CardTitle>
-            <CardDescription>Update your password here. After a successful change, you may need to sign in again.</CardDescription>
+            <CardTitle className="text-2xl">Đổi mật khẩu</CardTitle>
+            <CardDescription>Cập nhật mật khẩu của bạn tại đây. Sau khi thay đổi thành công, bạn có thể cần đăng nhập lại.</CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -76,7 +78,7 @@ export function ChangePasswordPage() {
               )}
 
               <div className="space-y-2">
-                <Label htmlFor="current-password">Current Password</Label>
+                <Label htmlFor="current-password">Mật khẩu hiện tại</Label>
                 <div className="relative">
                   <Input id="current-password" type={showPassword ? "text" : "password"} value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} required className="pr-10" />
                   <Button type="button" variant="ghost" size="sm" className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent" onClick={() => setShowPassword((prev) => !prev)}>
@@ -85,7 +87,7 @@ export function ChangePasswordPage() {
                 </div>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="new-password">New Password</Label>
+                <Label htmlFor="new-password">Mật khẩu mới</Label>
                 <div className="relative">
                   <Input id="new-password" type={showPassword ? "text" : "password"} value={newPassword} onChange={(e) => setNewPassword(e.target.value)} required minLength={8} className="pr-10" />
                   <Button type="button" variant="ghost" size="sm" className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent" onClick={() => setShowPassword((prev) => !prev)}>
@@ -94,7 +96,7 @@ export function ChangePasswordPage() {
                 </div>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="confirm-password">Confirm New Password</Label>
+                <Label htmlFor="confirm-password">Xác nhận mật khẩu mới</Label>
                 <div className="relative">
                   <Input id="confirm-password" type={showPassword ? "text" : "password"} value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required className="pr-10" />
                   <Button type="button" variant="ghost" size="sm" className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent" onClick={() => setShowPassword((prev) => !prev)}>
@@ -104,7 +106,17 @@ export function ChangePasswordPage() {
               </div>
 
               <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? "Updating..." : "Update Password"}
+                {isLoading ? "Đang cập nhật..." : "Cập nhật mật khẩu"}
+              </Button>
+              
+              <Button 
+                type="button" 
+                variant="outline" 
+                className="w-full" 
+                onClick={() => navigate(-1)}
+              >
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Quay lại
               </Button>
             </form>
           </CardContent>

@@ -211,7 +211,7 @@ export function ResultsPage() {
   if (isLoading || !user) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <div className="text-lg text-muted-foreground">Loading...</div>
+        <div className="text-lg text-muted-foreground">Đang tải...</div>
       </div>
     )
   }
@@ -225,69 +225,69 @@ export function ResultsPage() {
           <Button asChild variant="ghost" size="sm" className="mb-4">
             <Link to="/dashboard">
               <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Dashboard
+              Quay lại trang chính
             </Link>
           </Button>
-          <h1 className="mb-2 text-3xl font-bold text-foreground">My Results</h1>
-          <p className="text-muted-foreground">View your test history and performance analytics</p>
+          <h1 className="mb-2 text-3xl font-bold text-foreground">Kết quả của tôi</h1>
+          <p className="text-muted-foreground">Xem lịch sử bài kiểm tra và phân tích hiệu suất của bạn</p>
         </div>
 
         <div className="mb-8 grid gap-4 md:grid-cols-4">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Tests</CardTitle>
+              <CardTitle className="text-sm font-medium">Tổng số bài kiểm tra</CardTitle>
               <BookOpen className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{totalTests}</div>
-              <p className="text-xs text-muted-foreground">Completed</p>
+              <p className="text-xs text-muted-foreground">Đã hoàn thành</p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Average Score</CardTitle>
+              <CardTitle className="text-sm font-medium">Điểm trung bình</CardTitle>
               <TrendingUp className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{averageScore.toFixed(0)}%</div>
-              <p className="text-xs text-muted-foreground">Overall performance</p>
+              <p className="text-xs text-muted-foreground">Hiệu suất tổng thể</p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Best Score</CardTitle>
+              <CardTitle className="text-sm font-medium">Thành tích cao nhất</CardTitle>
               <Trophy className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{bestScore.toFixed(0)}%</div>
-              <p className="text-xs text-muted-foreground">Highest achievement</p>
+              <p className="text-xs text-muted-foreground">Thành tích cao nhất</p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Time</CardTitle>
+              <CardTitle className="text-sm font-medium">Tổng thời gian</CardTitle>
               <Clock className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{Math.floor(totalTimeTaken / 60)}m</div>
-              <p className="text-xs text-muted-foreground">Time spent learning</p>
+              <p className="text-xs text-muted-foreground">Thời gian học</p>
             </CardContent>
           </Card>
         </div>
 
         <div>
-          <h2 className="mb-4 text-xl font-bold text-foreground">Test History</h2>
+          <h2 className="mb-4 text-xl font-bold text-foreground">Lịch sử bài kiểm tra</h2>
           {results.length === 0 ? (
             <Card>
               <CardContent className="flex flex-col items-center justify-center py-12">
                 <BookOpen className="mb-4 h-12 w-12 text-muted-foreground" />
-                <p className="mb-2 text-lg font-medium text-foreground">No results yet</p>
-                <p className="mb-4 text-sm text-muted-foreground">Take your first test to see results here</p>
+                <p className="mb-2 text-lg font-medium text-foreground">Chưa có kết quả nào</p>
+                <p className="mb-4 text-sm text-muted-foreground">Hãy làm bài kiểm tra đầu tiên để xem kết quả tại đây</p>
                 <Button asChild>
-                  <Link to="/tests">Browse Tests</Link>
+                  <Link to="/tests">Duyệt các bài kiểm tra</Link>
                 </Button>
               </CardContent>
             </Card>
@@ -333,7 +333,7 @@ export function ResultsPage() {
                         <div className="text-right flex-shrink-0">
                           <div className="text-3xl font-bold text-primary">{percentage.toFixed(0)}%</div>
                           <p className="text-sm text-muted-foreground whitespace-nowrap">
-                            {result.score}/{resultWithExtras.totalMarks || result.totalQuestions * 10} marks
+                            {result.score}/{resultWithExtras.totalMarks || result.totalQuestions * 10} điểm
                           </p>
                         </div>
                       </div>
@@ -347,15 +347,15 @@ export function ResultsPage() {
                           </div>
                           <div className="flex items-center gap-1">
                             <BookOpen className="h-4 w-4" />
-                            <span>{test.questions.length} questions</span>
+                            <span>{test.questions.length} câu hỏi</span>
                           </div>
                         </div>
                         <div className="flex gap-2">
                           <Button asChild variant="outline" size="sm">
-                            <Link to={`/result/${result.id}`}>View Details</Link>
+                            <Link to={`/result/${result.id}`}>Xem chi tiết</Link>
                           </Button>
                           <Button size="sm" onClick={() => navigate(`/test/${test.id}`)}>
-                            Retake
+                            Làm lại
                           </Button>
                           <Button 
                             variant="ghost" 
@@ -379,15 +379,15 @@ export function ResultsPage() {
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete Submission?</AlertDialogTitle>
+            <AlertDialogTitle>Xóa bài nộp?</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete this submission? This action cannot be undone and will remove your result from the leaderboard.
+              Bạn có chắc chắn muốn xóa bài nộp này? Hành động này không thể hoàn tác và sẽ xóa kết quả của bạn khỏi bảng xếp hạng.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>Hủy</AlertDialogCancel>
             <AlertDialogAction onClick={handleDeleteConfirm} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
-              Delete
+              Xóa
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

@@ -158,8 +158,8 @@ export function AdminPage() {
       <main className="container mx-auto px-4 py-8">
         <div className="mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-foreground">Admin Console</h1>
-            <p className="text-muted-foreground">Manage users, exams, and platform activity</p>
+            <h1 className="text-3xl font-bold text-foreground">Admin quản lý</h1>
+            <p className="text-muted-foreground">Quản lý người dùng, bài thi, và hoạt động nền tảng</p>
           </div>
         </div>
 

@@ -241,7 +241,7 @@ export function ResultDetailPage() {
   if (isLoading || isLoadingResult || !user) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <div className="text-lg text-muted-foreground">Loading...</div>
+        <div className="text-lg text-muted-foreground">Đang tải...</div>
       </div>
     )
   }
@@ -255,7 +255,7 @@ export function ResultDetailPage() {
             <CardContent className="flex flex-col items-center justify-center py-12">
               <p className="mb-4 text-lg font-medium text-destructive">{error || "Result not found"}</p>
               <Button asChild>
-                <Link to="/results">Back to Results</Link>
+                <Link to="/results">Quay lại kết quả</Link>
               </Button>
             </CardContent>
           </Card>
@@ -271,7 +271,7 @@ export function ResultDetailPage() {
         <main className="container mx-auto px-4 py-8">
           <Card>
             <CardContent className="flex flex-col items-center justify-center py-12">
-              <p className="mb-4 text-lg font-medium text-muted-foreground">Loading test information...</p>
+              <p className="mb-4 text-lg font-medium text-muted-foreground">Đang tải thông tin bài kiểm tra...</p>
             </CardContent>
           </Card>
         </main>
@@ -320,7 +320,7 @@ export function ResultDetailPage() {
               <div className="mb-6 text-center">
                 <div className={`text-6xl font-bold ${performance.color}`}>{percentage.toFixed(0)}%</div>
                 <p className="mt-2 text-muted-foreground">
-                  {correctAnswers} out of {totalQuestions} correct
+                  {correctAnswers} trong số {totalQuestions} câu đúng
                 </p>
               </div>
 
@@ -331,7 +331,7 @@ export function ResultDetailPage() {
                   <CheckCircle2 className="h-8 w-8 text-success" />
                   <div>
                     <p className="text-2xl font-bold text-foreground">{correctAnswers}</p>
-                    <p className="text-sm text-muted-foreground">Correct</p>
+                    <p className="text-sm text-muted-foreground">Đúng</p>
                   </div>
                 </div>
 
@@ -339,7 +339,7 @@ export function ResultDetailPage() {
                   <XCircle className="h-8 w-8 text-destructive" />
                   <div>
                     <p className="text-2xl font-bold text-foreground">{incorrectAnswers}</p>
-                    <p className="text-sm text-muted-foreground">Incorrect</p>
+                    <p className="text-sm text-muted-foreground">Sai</p>
                   </div>
                 </div>
 
@@ -347,7 +347,7 @@ export function ResultDetailPage() {
                   <Clock className="h-8 w-8 text-primary" />
                   <div>
                     <p className="text-2xl font-bold text-foreground">{formatTime(result.timeTaken)}</p>
-                    <p className="text-sm text-muted-foreground">Time Taken</p>
+                    <p className="text-sm text-muted-foreground">Thời gian hoàn thành</p>
                   </div>
                 </div>
               </div>
@@ -355,7 +355,7 @@ export function ResultDetailPage() {
               <div className="mt-6 flex flex-wrap gap-3">
                 <Button asChild className="flex-1">
                   <Link to="/dashboard" className="w-full">
-                    Back to Dashboard
+                    Quay lại Trang chính
                   </Link>
                 </Button>
                 {test?.id && (
@@ -364,7 +364,7 @@ export function ResultDetailPage() {
                     className="flex-1 bg-transparent"
                     onClick={() => navigate(`/test/${test.id}`)}
                   >
-                    Retake Test
+                    Làm lại bài kiểm tra
                   </Button>
                 )}
               </div>
@@ -373,11 +373,11 @@ export function ResultDetailPage() {
         </div>
 
         <div>
-          <h2 className="mb-4 text-2xl font-bold text-foreground">Answer Review</h2>
+          <h2 className="mb-4 text-2xl font-bold text-foreground">Xem lại câu trả lời</h2>
           {test.questions.length === 0 ? (
             <Card>
               <CardContent className="flex flex-col items-center justify-center py-12">
-                <p className="text-muted-foreground">No questions available for review.</p>
+                <p className="text-muted-foreground">Không có câu hỏi để xem lại.</p>
                 <p className="mt-2 text-sm text-muted-foreground">
                   Score: {result.score} / {result.totalQuestions}
                 </p>
@@ -396,16 +396,16 @@ export function ResultDetailPage() {
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex-1">
                         <div className="mb-2 flex items-center gap-2">
-                          <Badge variant="outline">Question {index + 1}</Badge>
+                          <Badge variant="outline">Câu hỏi {index + 1}</Badge>
                           {isCorrect ? (
                             <Badge className="bg-success text-success-foreground">
                               <CheckCircle2 className="mr-1 h-3 w-3" />
-                              Correct
+                              Đúng
                             </Badge>
                           ) : (
                             <Badge variant="destructive">
                               <XCircle className="mr-1 h-3 w-3" />
-                              {wasAnswered ? "Incorrect" : "Not Answered"}
+                              {wasAnswered ? "Sai" : "Chưa trả lời"}
                             </Badge>
                           )}
                         </div>
@@ -417,19 +417,19 @@ export function ResultDetailPage() {
                     {question.questionType === 'essay' ? (
                       <div className="space-y-3">
                         <div>
-                          <p className="text-sm font-semibold text-muted-foreground mb-2">Your Answer:</p>
+                          <p className="text-sm font-semibold text-muted-foreground mb-2">Câu trả lời của bạn:</p>
                           <div className="rounded-lg border border-border bg-muted/30 p-4 min-h-[100px]">
                             {(() => {
                               console.log(`Essay Q${index + 1} - userAnswer:`, userAnswer, typeof userAnswer)
                               if (userAnswer !== null && userAnswer !== undefined && String(userAnswer).trim()) {
                                 return <p className="text-sm whitespace-pre-wrap leading-relaxed">{String(userAnswer)}</p>
                               }
-                              return <p className="text-sm text-muted-foreground italic">No answer provided</p>
+                              return <p className="text-sm text-muted-foreground italic">Không có câu trả lời</p>
                             })()}
                           </div>
                         </div>
                         {!wasAnswered && (
-                          <p className="text-sm text-destructive">This question was not answered.</p>
+                          <p className="text-sm text-destructive">Câu hỏi chưa được trả lời.</p>
                         )}
                       </div>
                     ) : (

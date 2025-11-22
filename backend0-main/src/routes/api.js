@@ -14,6 +14,8 @@ router.post('/auth/login', authController.login);
 router.get('/auth/me', authController.getCurrentUser);
 router.post('/auth/logout', authController.logout);
 router.put('/auth/change-password', authController.changePassword);
+router.post('/auth/confirm-reset-password', authController.confirmResetPassword);
+router.post('/auth/forgot-password', authController.forgotPassword);
 
 // Exam routes
 router.get('/exams', examController.getAllExams);

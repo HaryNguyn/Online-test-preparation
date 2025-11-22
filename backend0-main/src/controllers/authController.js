@@ -148,15 +148,100 @@ const authController = {
 
     changePassword: async (req, res) => {
         try {
-            // This logic is for a "forgot password" flow where the user provides an email.
-            // A real-world application would have a token verification step.
+            const { userId, currentPassword, newPassword } = req.body;
+
+            if (!userId || !currentPassword || !newPassword) {
+                return res.status(400).json({ error: 'User ID, current password, and new password are required' });
+            }
+
+            // Get user
+            const [users] = await connection.query(
+                'SELECT * FROM Users WHERE id = ?',
+                [userId]
+            );
+
+            if (users.length === 0) {
+                return res.status(404).json({ error: 'User not found' });
+            }
+
+            const user = users[0];
+
+            // Verify current password
+            const validPassword = await bcrypt.compare(currentPassword, user.password);
+            if (!validPassword) {
+                return res.status(401).json({ error: 'Current password is incorrect' });
+            }
+
+            // Hash new password
+            const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+
+            // Update password
+            await connection.query(
+                'UPDATE Users SET password = ? WHERE id = ?',
+                [hashedNewPassword, userId]
+            );
+
+            res.json({ message: 'Password changed successfully' });
+        } catch (error) {
+            console.error('Change password error:', error);
+            res.status(500).json({ error: 'Failed to change password' });
+        }
+    },
+
+    confirmResetPassword: async (req, res) => {
+        try {
+            const { token, newPassword } = req.body;
+
+            if (!token || !newPassword) {
+                return res.status(400).json({ error: 'Token and new password are required' });
+            }
+
+            // In a real application, you would:
+            // 1. Verify the token from a password_reset_tokens table
+            // 2. Check if token is expired
+            // 3. Get the user ID from the token
+            // For now, we'll use a simple mock: token format is "email_timestamp"
+            const [email] = token.split('_');
+            
+            if (!email) {
+                return res.status(400).json({ error: 'Invalid token' });
+            }
+
+            // Get user by email
+            const [users] = await connection.query(
+                'SELECT * FROM Users WHERE email = ?',
+                [email]
+            );
+
+            if (users.length === 0) {
+                return res.status(404).json({ error: 'Invalid or expired token' });
+            }
+
+            // Hash new password
+            const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+
+            // Update password
+            await connection.query(
+                'UPDATE Users SET password = ? WHERE id = ?',
+                [hashedNewPassword, users[0].id]
+            );
+
+            res.json({ message: 'Password reset successfully' });
+        } catch (error) {
+            console.error('Confirm reset password error:', error);
+            res.status(500).json({ error: 'Failed to reset password' });
+        }
+    },
+
+    forgotPassword: async (req, res) => {
+        try {
             const { email, newPassword } = req.body;
 
             if (!email || !newPassword) {
                 return res.status(400).json({ error: 'Email and new password are required' });
             }
 
-            // Get user
+            // Get user by email
             const [users] = await connection.query(
                 'SELECT * FROM Users WHERE email = ?',
                 [email]
@@ -175,10 +260,10 @@ const authController = {
                 [hashedNewPassword, users[0].id]
             );
 
-            res.json({ message: 'Password changed successfully' });
+            res.json({ message: 'Password reset successfully' });
         } catch (error) {
-            console.error('Change password error:', error);
-            res.status(500).json({ error: 'Failed to change password' });
+            console.error('Forgot password error:', error);
+            res.status(500).json({ error: 'Failed to reset password' });
         }
     }
 };

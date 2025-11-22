@@ -70,9 +70,9 @@ export function LoginPage() {
 
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password">Mật khẩu</Label>
                 <Link to="/forgot-password" className="text-sm text-primary hover:underline">
-                  Forgot password?
+                  Quên mật khẩu?
                 </Link>
               </div>
               <div className="relative">
@@ -104,12 +104,12 @@ export function LoginPage() {
                 <span className="w-full border-t border-border" />
               </div>
               <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-card px-2 text-muted-foreground">Demo Accounts</span>
+                <span className="bg-card px-2 text-muted-foreground">Tài khoản Demo</span>
               </div>
             </div>
 
             <div className="space-y-2 rounded-lg bg-muted p-4 text-sm">
-              <p className="font-medium text-foreground">Try these demo accounts:</p>
+              <p className="font-medium text-foreground">Thử các tài khoản demo này:</p>
               <div className="space-y-1 text-muted-foreground">
                 <p>Admin: admin@example.com / password123</p>
                 <p>Student: student@example.com / password123</p>

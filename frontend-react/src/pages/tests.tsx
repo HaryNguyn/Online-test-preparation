@@ -102,7 +102,7 @@ export function TestsPage() {
   if (isLoading || !user) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <div className="text-lg text-muted-foreground">Loading...</div>
+        <div className="text-lg text-muted-foreground">Đang tải...</div>
       </div>
     )
   }
@@ -116,16 +116,16 @@ export function TestsPage() {
           <Button asChild variant="ghost" size="sm" className="mb-4">
             <Link to="/dashboard">
               <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Dashboard
+              Quay lại Trang chính
             </Link>
           </Button>
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="mb-2 text-3xl font-bold text-foreground">All Tests</h1>
-              <p className="text-muted-foreground">Browse and take practice tests</p>
+              <h1 className="mb-2 text-3xl font-bold text-foreground">Tất cả các bài kiểm tra</h1>
+              <p className="text-muted-foreground">Duyệt và làm các bài kiểm tra thực hành</p>
             </div>
             <Badge variant="secondary" className="text-base">
-              {filteredTests.length} tests
+              {filteredTests.length} bài kiểm tra
             </Badge>
           </div>
         </div>
@@ -146,7 +146,7 @@ export function TestsPage() {
               <SelectValue placeholder="Subject" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Subjects</SelectItem>
+              <SelectItem value="all">Tất cả các môn</SelectItem>
               {subjects.map((subject) => (
                 <SelectItem key={subject} value={subject}>
                   {subject}
@@ -159,7 +159,7 @@ export function TestsPage() {
               <SelectValue placeholder="Grade" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Grades</SelectItem>
+              <SelectItem value="all">Tất cả các lớp</SelectItem>
               {grades.map((grade) => (
                 <SelectItem key={grade} value={grade}>
                   {grade}
@@ -173,8 +173,8 @@ export function TestsPage() {
           <Card>
             <CardContent className="flex flex-col items-center justify-center py-12">
               <BookOpen className="mb-4 h-12 w-12 text-muted-foreground" />
-              <p className="text-lg font-medium text-foreground">No tests found</p>
-              <p className="text-sm text-muted-foreground">Try adjusting your filters</p>
+              <p className="text-lg font-medium text-foreground">Không tìm thấy bài kiểm tra</p>
+              <p className="text-sm text-muted-foreground">Thử điều chỉnh bộ lọc của bạn</p>
             </CardContent>
           </Card>
         ) : (
@@ -188,7 +188,7 @@ export function TestsPage() {
                   <CardHeader>
                     <div className="mb-2 flex items-start justify-between">
                       <Badge variant="secondary">{test.subject}</Badge>
-                      {hasCompleted && <Badge className="bg-success text-success-foreground">Completed</Badge>}
+                      {hasCompleted && <Badge className="bg-success text-success-foreground">Hoàn thành</Badge>}
                     </div>
                     <CardTitle className="text-lg">{test.title}</CardTitle>
                     <CardDescription className="line-clamp-2">{test.description}</CardDescription>
@@ -197,11 +197,11 @@ export function TestsPage() {
                     <div className="mb-4 space-y-2 text-sm text-muted-foreground">
                       <div className="flex items-center gap-2">
                         <Clock className="h-4 w-4" />
-                        <span>{test.duration} minutes</span>
+                        <span>{test.duration} phút</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <BookOpen className="h-4 w-4" />
-                        <span>{test.questions.length} questions</span>
+                        <span>{test.questions.length} Câu hỏi</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <Trophy className="h-4 w-4" />

@@ -249,12 +249,12 @@ export function DashboardPage() {
                       {hasCompleted && userResult && (
                         <div className="mb-4 rounded-lg bg-muted p-3">
                           <p className="text-sm font-medium text-foreground">
-                            Your Score: {((userResult.score / userResult.totalQuestions) * 100).toFixed(0)}%
+                            Điểm của bạn: {((userResult.score / userResult.totalQuestions) * 100).toFixed(0)}%
                           </p>
                         </div>
                       )}
                       <Button className="w-full" onClick={() => navigate(`/test/${test.id}`)}>
-                        {hasCompleted ? "Retake Test" : "Start Test"}
+                        {hasCompleted ? "Làm lại bài kiểm tra" : "Bắt đầu bài kiểm tra"}
                       </Button>
                     </CardContent>
                   </Card>

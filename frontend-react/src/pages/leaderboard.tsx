@@ -3,7 +3,7 @@ import { Link } from "react-router-dom"
 import { useAuth } from "@/contexts/auth-context"
 import { DashboardHeader } from "@/components/dashboard-header"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { api } from "@/lib/api"
@@ -117,16 +117,16 @@ export function LeaderboardPage() {
           <Button asChild variant="ghost" size="sm" className="mb-4">
             <Link to="/dashboard">
               <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Dashboard
+              Quay lại trang
             </Link>
           </Button>
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="mb-2 text-3xl font-bold text-foreground">Leaderboard</h1>
-              <p className="text-muted-foreground">Top performers across all tests</p>
+              <h1 className="mb-2 text-3xl font-bold text-foreground">Bảng xếp hạng</h1>
+              <p className="text-muted-foreground">Top xếp hạng đạt điểm cao</p>
             </div>
             <Badge variant="secondary" className="text-base">
-              {leaderboard.length} entries
+              {leaderboard.length} mục
             </Badge>
           </div>
         </div>
@@ -138,7 +138,7 @@ export function LeaderboardPage() {
                 <SelectValue placeholder="Subject" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Subjects</SelectItem>
+                <SelectItem value="all">Tất cả môn học</SelectItem>
                 {subjects.map((subject) => (
                   <SelectItem key={subject} value={subject}>
                     {subject}
@@ -153,7 +153,7 @@ export function LeaderboardPage() {
                 <SelectValue placeholder="Grade" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Grades</SelectItem>
+                <SelectItem value="all">Tất cả khối</SelectItem>
                 {grades.map((grade) => (
                   <SelectItem key={grade} value={grade}>
                     {grade}
@@ -168,15 +168,15 @@ export function LeaderboardPage() {
           <Card>
             <CardContent className="flex flex-col items-center justify-center py-12">
               <p className="mb-4 text-lg font-medium text-destructive">{error}</p>
-              <Button onClick={() => window.location.reload()}>Retry</Button>
+              <Button onClick={() => window.location.reload()}>Thử lại</Button>
             </CardContent>
           </Card>
         ) : leaderboard.length === 0 ? (
           <Card>
             <CardContent className="flex flex-col items-center justify-center py-12">
               <Trophy className="mb-4 h-12 w-12 text-muted-foreground" />
-              <p className="mb-2 text-lg font-medium text-foreground">No leaderboard entries yet</p>
-              <p className="text-sm text-muted-foreground">Complete tests to see your ranking here</p>
+              <p className="mb-2 text-lg font-medium text-foreground">Chưa có mục bảng xếp hạng nào</p>
+              <p className="text-sm text-muted-foreground">Hoàn thành các bài kiểm tra để xem xếp hạng của bạn tại đây</p>
             </CardContent>
           </Card>
         ) : (
@@ -223,13 +223,13 @@ export function LeaderboardPage() {
                         <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
                           <div className="flex items-center gap-1">
                             <Trophy className="h-4 w-4" />
-                            <span>Avg: {Number(percentage).toFixed(1)}%</span>
+                            <span>Trung bình: {Number(percentage).toFixed(1)}%</span>
                           </div>
                           <div className="flex items-center gap-1">
-                            <span>Total Score: {totalScore}</span>
+                            <span>Tổng điểm: {totalScore}</span>
                           </div>
                           <div className="flex items-center gap-1">
-                            <span>Exams: {examsTaken}</span>
+                            <span>Bài kiểm tra: {examsTaken}</span>
                           </div>
                           {entry.timeTaken && (
                             <div className="flex items-center gap-1">

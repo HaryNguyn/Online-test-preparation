@@ -24,8 +24,9 @@ interface AuthContextValue {
   ) => Promise<{ success: boolean; error?: string }>
   logout: () => void
   resetPassword: (email: string) => Promise<{ success: boolean; error?: string; message?: string }>
-  // This is now for the "forgot password" flow
-  changePassword: (email: string, newPassword: string) => Promise<{ success: boolean; error?: string }>
+  confirmResetPassword: (token: string, newPassword: string) => Promise<{ success: boolean; error?: string }>
+  forgotPassword: (email: string, newPassword: string) => Promise<{ success: boolean; error?: string }>
+  changePassword: (currentPassword: string, newPassword: string) => Promise<{ success: boolean; error?: string }>
   isLoading: boolean
 }
 
@@ -126,14 +127,50 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return { success: true, message: "If an account with this email exists, a password reset link has been sent." }
   }
 
-  const changePassword = async (email: string, newPassword: string) => {
+  const confirmResetPassword = async (token: string, newPassword: string) => {
+    try {
+      if (!token || !newPassword) {
+        return { success: false, error: "Token and new password are required" };
+      }
+
+      // Call backend API to confirm password reset with token
+      await api.confirmResetPassword({ token, newPassword });
+
+      return { success: true }
+    } catch (error) {
+      const err = error as Error
+      return { success: false, error: err.message || "Failed to reset password" }
+    }
+  }
+
+  const forgotPassword = async (email: string, newPassword: string) => {
     try {
       if (!email || !newPassword) {
         return { success: false, error: "Email and new password are required" };
       }
 
-      // The backend now expects email and newPassword for the forgot password flow
-      await api.changePassword({ email, newPassword });
+      // Call backend API to reset password via email (no login required)
+      await api.forgotPassword({ email, newPassword });
+
+      return { success: true }
+    } catch (error) {
+      const err = error as Error
+      return { success: false, error: err.message || "Failed to reset password" }
+    }
+  }
+
+  const changePassword = async (currentPassword: string, newPassword: string) => {
+    try {
+      if (!user) {
+        return { success: false, error: "User not logged in" };
+      }
+      
+      if (!currentPassword || !newPassword) {
+        return { success: false, error: "Current and new password are required" };
+      }
+
+      // Call API with userId, current password, and new password
+      await api.changePassword({ userId: user.id, currentPassword, newPassword });
 
       return { success: true }
     } catch (error) {
@@ -143,7 +180,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   const value = useMemo(
-    () => ({ user, setUser, login, register, logout, resetPassword, changePassword, isLoading }),
+    () => ({ user, setUser, login, register, logout, resetPassword, confirmResetPassword, forgotPassword, changePassword, isLoading }),
     [user, isLoading],
   )
 

@@ -174,15 +174,15 @@ export function ProfilePage() {
               Back to Dashboard
             </Link>
           </Button>
-          <h1 className="mb-2 text-3xl font-bold text-foreground">Profile Settings</h1>
-          <p className="text-muted-foreground">Update your profile information and avatar</p>
+          <h1 className="mb-2 text-3xl font-bold text-foreground">Cài đặt trang cá nhân</h1>
+          <p className="text-muted-foreground">Cập nhật thông tin hồ sơ và ảnh đại diện của bạn</p>
         </div>
 
         <div className="mx-auto max-w-2xl">
           <Card>
             <CardHeader>
-              <CardTitle>Profile Information</CardTitle>
-              <CardDescription>Manage your account settings and preferences</CardDescription>
+              <CardTitle>Thông tin cá nhân</CardTitle>
+              <CardDescription>Quản lý cài đặt và tùy chọn tài khoản của bạn</CardDescription>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-6">
@@ -229,13 +229,13 @@ export function ProfilePage() {
                         )}
                       </div>
                       <p className="text-xs text-muted-foreground">
-                        Recommended: Square image, at least 200x200 pixels. Max size: 5MB
+                        Khuyến nghị: Ảnh vuông, ít nhất 200x200 pixel. Kích thước tối đa: 5MB
                       </p>
                       {uploadProgress !== null && (
                         <div className="space-y-1">
                           <Progress value={uploadProgress} className="h-2" />
                           <p className="text-xs text-muted-foreground">
-                            Uploading... {uploadProgress}%
+                            Đang tải ... {uploadProgress}%
                           </p>
                         </div>
                       )}
@@ -247,7 +247,7 @@ export function ProfilePage() {
                 <div className="space-y-2">
                   <Label htmlFor="name">
                     <User className="mr-2 inline h-4 w-4" />
-                    Full Name
+                    Họ và tên
                   </Label>
                   <Input
                     id="name"
@@ -272,13 +272,13 @@ export function ProfilePage() {
                     className="bg-muted"
                   />
                   <p className="text-xs text-muted-foreground">
-                    Email cannot be changed. Contact administrator if you need to update it.
+                    Email không thể thay đổi. Liên hệ với quản trị viên nếu bạn cần cập nhật.
                   </p>
                 </div>
 
                 {/* Role (read-only) */}
                 <div className="space-y-2">
-                  <Label htmlFor="role">Role</Label>
+                  <Label htmlFor="role">Đối tượng</Label>
                   <Input
                     id="role"
                     type="text"
@@ -305,10 +305,10 @@ export function ProfilePage() {
                 {/* Submit Button */}
                 <div className="flex justify-end gap-3">
                   <Button type="button" variant="outline" onClick={() => navigate(-1)}>
-                    Cancel
+                    Hủy
                   </Button>
                   <Button type="submit" disabled={isLoading || uploadProgress !== null}>
-                    {isLoading ? "Saving..." : "Save Changes"}
+                    {isLoading ? "Đang lưu..." : "Lưu thay đổi"}
                   </Button>
                 </div>
               </form>

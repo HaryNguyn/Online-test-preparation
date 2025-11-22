@@ -91,8 +91,8 @@ export function RegisterPage() {
 
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle className="text-2xl">Create Account</CardTitle>
-          <CardDescription>Sign up to start your learning journey</CardDescription>
+          <CardTitle className="text-2xl">Tạo tài khoản</CardTitle>
+          <CardDescription>Đăng ký để bắt đầu hành trình học tập của bạn</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -104,7 +104,7 @@ export function RegisterPage() {
             )}
 
             <div className="space-y-2">
-              <Label htmlFor="name">Full Name</Label>
+              <Label htmlFor="name">Họ và tên</Label>
               <Input
                 id="name"
                 name="name"
@@ -132,13 +132,13 @@ export function RegisterPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">Mật khẩu</Label>
               <div className="relative">
                 <Input
                   id="password"
                   name="password"
                   type={showPassword ? "text" : "password"}
-                  placeholder="Create a password"
+                  placeholder="Tạo mật khẩu"
                   autoComplete="new-password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -170,55 +170,55 @@ export function RegisterPage() {
             )}
 
             <div className="space-y-2">
-              <Label htmlFor="role">I am a</Label>
+              <Label htmlFor="role">Tôi là</Label>
               <Select name="role" value={role} onValueChange={(value) => setRole(value as UserRole)}>
                 <SelectTrigger id="role">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="student">Student</SelectItem>
-                  <SelectItem value="teacher">Teacher</SelectItem>
-                  <SelectItem value="parent">Parent</SelectItem>
+                  <SelectItem value="student">Học sinh</SelectItem>
+                  <SelectItem value="teacher">Giáo viên</SelectItem>
+                  <SelectItem value="parent">Phụ huynh</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
             {role === "student" && (
               <div className="space-y-2">
-                <Label htmlFor="grade">Grade</Label>
+                <Label htmlFor="grade">Lớp</Label>
                 <Select name="grade" value={grade} onValueChange={setGrade}>
                   <SelectTrigger id="grade">
-                    <SelectValue placeholder="Select your grade" />
+                    <SelectValue placeholder="Chọn lớp của bạn" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="Grade 6">Grade 6</SelectItem>
-                    <SelectItem value="Grade 7">Grade 7</SelectItem>
-                    <SelectItem value="Grade 8">Grade 8</SelectItem>
-                    <SelectItem value="Grade 9">Grade 9</SelectItem>
-                    <SelectItem value="Grade 10">Grade 10</SelectItem>
-                    <SelectItem value="Grade 11">Grade 11</SelectItem>
-                    <SelectItem value="Grade 12">Grade 12</SelectItem>
+                    <SelectItem value="Grade 6">Lớp 6</SelectItem>
+                    <SelectItem value="Grade 7">Lớp 7</SelectItem>
+                    <SelectItem value="Grade 8">Lớp 8</SelectItem>
+                    <SelectItem value="Grade 9">Lớp 9</SelectItem>
+                    <SelectItem value="Grade 10">Lớp 10</SelectItem>
+                    <SelectItem value="Grade 11">Lớp 11</SelectItem>
+                    <SelectItem value="Grade 12">Lớp 12</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
             )}
 
             <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? "Creating account..." : "Create Account"}
+              {isLoading ? "Đang tạo tài khoản..." : "Tạo tài khoản"}
             </Button>
           </form>
         </CardContent>
         <CardFooter>
           <p className="w-full text-center text-sm text-muted-foreground">
-            Already have an account?{" "}
-            <Link to="/login" className="text-primary hover:underline">Sign in</Link>
+            Đã có tài khoản?{" "}
+            <Link to="/login" className="text-primary hover:underline">Đăng nhập</Link>
           </p>
         </CardFooter>
       </Card>
 
       <div className="mt-8 text-center">
         <Link to="/" className="text-sm text-muted-foreground hover:text-foreground">
-          Back to Home
+          Quay lại trang chủ
         </Link>
       </div>
     </div>

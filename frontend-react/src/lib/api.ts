@@ -47,9 +47,21 @@ export const api = {
 
   me: (userId: string) => request<{ user: User }>(`/auth/me?userId=${encodeURIComponent(userId)}`),
 
-  changePassword: (payload: { email: string; newPassword: string }) =>
+  changePassword: (payload: { userId: string; currentPassword: string; newPassword: string }) =>
     request<{ message: string }>(`/auth/change-password`, {
       method: "PUT",
+      body: JSON.stringify(payload),
+    }),
+
+  confirmResetPassword: (payload: { token: string; newPassword: string }) =>
+    request<{ message: string }>(`/auth/confirm-reset-password`, {
+      method: "POST",
+      body: JSON.stringify(payload),
+    }),
+
+  forgotPassword: (payload: { email: string; newPassword: string }) =>
+    request<{ message: string }>(`/auth/forgot-password`, {
+      method: "POST",
       body: JSON.stringify(payload),
     }),
 

@@ -126,8 +126,8 @@ export function TestDetailPage() {
 
     if (dataSource === "backend") {
       try {
-        console.log('📤 Submitting answers:', answers)
-        console.log('📊 Answer types:', answers.map((a, i) => ({ index: i, type: typeof a, value: a })))
+        console.log(' Submitting answers:', answers)
+        console.log(' Answer types:', answers.map((a, i) => ({ index: i, type: typeof a, value: a })))
         
         const { submission } = await api.createSubmission({
           exam_id: test.id,
@@ -217,7 +217,7 @@ export function TestDetailPage() {
   if (isLoading || !user || !test) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <div className="text-lg text-muted-foreground">Loading...</div>
+        <div className="text-lg text-muted-foreground">Đang tải...</div>
       </div>
     )
   }
@@ -229,8 +229,8 @@ export function TestDetailPage() {
         <main className="container mx-auto flex items-center justify-center px-4 py-8">
           <Card className="w-full max-w-md text-center">
             <CardHeader>
-              <CardTitle>No Questions Found</CardTitle>
-              <CardDescription>This test does not have any questions yet. Please check back later.</CardDescription>
+              <CardTitle>Không tìm thấy câu hỏi nào</CardTitle>
+              <CardDescription>Bài kiểm tra này chưa có câu hỏi nào. Vui lòng quay lại sau.</CardDescription>
             </CardHeader>
           </Card>
         </main>
@@ -255,40 +255,40 @@ export function TestDetailPage() {
               <CardContent className="space-y-6">
                 <div className="space-y-4">
                   <div className="flex items-center justify-between rounded-lg border border-border p-4">
-                    <span className="text-sm font-medium text-foreground">Duration</span>
-                    <span className="text-sm text-muted-foreground">{test.duration} minutes</span>
+                    <span className="text-sm font-medium text-foreground">Thời lượng</span>
+                    <span className="text-sm text-muted-foreground">{test.duration} phút</span>
                   </div>
                   <div className="flex items-center justify-between rounded-lg border border-border p-4">
-                    <span className="text-sm font-medium text-foreground">Questions</span>
+                    <span className="text-sm font-medium text-foreground">Câu hỏi</span>
                     <span className="text-sm text-muted-foreground">{test.questions.length}</span>
                   </div>
                   <div className="flex items-center justify-between rounded-lg border border-border p-4">
-                    <span className="text-sm font-medium text-foreground">Total Marks</span>
+                    <span className="text-sm font-medium text-foreground">Tổng điểm</span>
                     <span className="text-sm text-muted-foreground">{test.totalMarks}</span>
                   </div>
                   <div className="flex items-center justify-between rounded-lg border border-border p-4">
-                    <span className="text-sm font-medium text-foreground">Grade Level</span>
+                    <span className="text-sm font-medium text-foreground">Lớp</span>
                     <span className="text-sm text-muted-foreground">{test.grade}</span>
                   </div>
                 </div>
 
                 <div className="rounded-lg bg-muted p-4">
-                  <h3 className="mb-2 font-semibold text-foreground">Instructions:</h3>
+                  <h3 className="mb-2 font-semibold text-foreground">Hướng dẫn:</h3>
                   <ul className="space-y-1 text-sm text-muted-foreground">
-                    <li>• Answer all questions to the best of your ability</li>
-                    <li>• You can navigate between questions using the question palette</li>
-                    <li>• The timer will start when you click "Start Test"</li>
-                    <li>• The test will auto-submit when time runs out</li>
-                    <li>• You can review your answers before submitting</li>
+                    <li>• Trả lời tất cả các câu hỏi một cách tốt nhất có thể</li>
+                    <li>• Bạn có thể điều hướng giữa các câu hỏi bằng cách sử dụng bảng câu hỏi</li>
+                    <li>• Bộ đếm thời gian sẽ bắt đầu khi bạn nhấn "Bắt đầu bài kiểm tra"</li>
+                    <li>• Bài kiểm tra sẽ tự động gửi khi hết thời gian</li>
+                    <li>• Bạn có thể xem lại câu trả lời trước khi gửi</li>
                   </ul>
                 </div>
 
                 <div className="flex gap-3">
                   <Button onClick={handleStartTest} className="flex-1">
-                    Start Test
+                    Bắt đầu bài kiểm tra
                   </Button>
                   <Button variant="outline" onClick={() => navigate("/dashboard", { replace: true })}>
-                    Cancel
+                    Hủy
                   </Button>
                 </div>
               </CardContent>

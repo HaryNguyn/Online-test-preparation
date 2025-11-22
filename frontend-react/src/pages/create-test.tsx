@@ -258,42 +258,42 @@ export function CreateTestPage() {
 
               {/* Exam Details */}
               <div className="space-y-4 rounded-lg border p-4">
-                <h3 className="text-lg font-medium">Exam Details</h3>
+                <h3 className="text-lg font-medium">Chi tiết bài kiểm tra</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2"><Label htmlFor="title">Title</Label><Input id="title" value={title} onChange={e => setTitle(e.target.value)} required /></div>
-                  <div className="space-y-2"><Label htmlFor="subject">Subject</Label><Input id="subject" value={subject} onChange={e => setSubject(e.target.value)} required /></div>
-                  <div className="space-y-2"><Label htmlFor="grade">Grade Level</Label><Input id="grade" value={gradeLevel} onChange={e => setGradeLevel(e.target.value)} required /></div>
-                  <div className="space-y-2"><Label htmlFor="duration">Duration (minutes)</Label><Input id="duration" type="number" value={duration} onChange={e => setDuration(Number(e.target.value))} required /></div>
+                  <div className="space-y-2"><Label htmlFor="title">Tiêu đề</Label><Input id="title" value={title} onChange={e => setTitle(e.target.value)} required /></div>
+                  <div className="space-y-2"><Label htmlFor="subject">Môn học</Label><Input id="subject" value={subject} onChange={e => setSubject(e.target.value)} required /></div>
+                  <div className="space-y-2"><Label htmlFor="grade">Cấp lớp</Label><Input id="grade" value={gradeLevel} onChange={e => setGradeLevel(e.target.value)} required /></div>
+                  <div className="space-y-2"><Label htmlFor="duration">Thời lượng (phút)</Label><Input id="duration" type="number" value={duration} onChange={e => setDuration(Number(e.target.value))} required /></div>
                 </div>
-                <div className="space-y-2"><Label htmlFor="description">Description</Label><Textarea id="description" value={description} onChange={e => setDescription(e.target.value)} /></div>
+                <div className="space-y-2"><Label htmlFor="description">Mô tả</Label><Textarea id="description" value={description} onChange={e => setDescription(e.target.value)} /></div>
               </div>
 
               {/* Questions */}
               <div className="space-y-6">
-                <h3 className="text-lg font-medium">Questions</h3>
+                <h3 className="text-lg font-medium">Câu hỏi</h3>
                 {questions.map((q, qIndex) => (
                   <div key={q.localId} className="space-y-4 rounded-lg border p-4 relative">
                     <div className="flex justify-between items-center">
-                      <Label className="text-base">Question {qIndex + 1}</Label>
+                      <Label className="text-base">Câu hỏi {qIndex + 1}</Label>
                       {questions.length > 1 && <Button type="button" variant="ghost" size="icon" className="text-destructive" onClick={() => removeQuestion(q.localId)}><Trash2 className="h-4 w-4" /></Button>}
                     </div>
                     <div className="space-y-2">
-                      <Label>Question Type</Label>
+                      <Label>Loại câu hỏi</Label>
                       <Select value={q.question_type} onValueChange={value => handleQuestionChange(q.localId, 'question_type', value as any)}>
                         <SelectTrigger><SelectValue /></SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="multiple_choice_single">Single Choice</SelectItem>
-                          <SelectItem value="multiple_choice_multiple">Multiple Choice</SelectItem>
-                          <SelectItem value="essay">Essay</SelectItem>
+                          <SelectItem value="multiple_choice_single">Lựa chọn đơn</SelectItem>
+                          <SelectItem value="multiple_choice_multiple">Lựa chọn nhiều</SelectItem>
+                          <SelectItem value="essay">Tự luận</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
-                    <Textarea placeholder="Enter question text..." value={q.question_text} onChange={e => handleQuestionChange(q.localId, 'question_text', e.target.value)} required />
+                    <Textarea placeholder="Nhập nội dung câu hỏi..." value={q.question_text} onChange={e => handleQuestionChange(q.localId, 'question_text', e.target.value)} required />
                     {q.question_type !== 'essay' && (
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {q.options.map((opt, optIndex) => (
                           <div key={optIndex} className="space-y-2">
-                            <Label htmlFor={`q${q.localId}-opt${optIndex}`}>Option {optIndex + 1}</Label>
+                            <Label htmlFor={`q${q.localId}-opt${optIndex}`}>Lựa chọn {optIndex + 1}</Label>
                             <Input id={`q${q.localId}-opt${optIndex}`} value={opt} onChange={e => handleOptionChange(q.localId as any, optIndex, e.target.value)} required />
                           </div>
                         ))}
@@ -301,12 +301,12 @@ export function CreateTestPage() {
                     )}
                     {q.question_type === 'multiple_choice_single' && (
                       <div className="space-y-2">
-                        <Label>Correct Answer</Label>
+                        <Label>Đáp án đúng</Label>
                         <Select value={String(q.correct_answer)} onValueChange={value => handleQuestionChange(q.localId, 'correct_answer', Number(value))}>
                           <SelectTrigger><SelectValue /></SelectTrigger>
                           <SelectContent>
                             {q.options.map((_, optIndex) => (
-                              <SelectItem key={optIndex} value={String(optIndex)}>Option {optIndex + 1}</SelectItem>
+                              <SelectItem key={optIndex} value={String(optIndex)}>Lựa chọn {optIndex + 1}</SelectItem>
                             ))}
                           </SelectContent>
                         </Select>
@@ -314,7 +314,7 @@ export function CreateTestPage() {
                     )}
                     {q.question_type === 'multiple_choice_multiple' && (
                       <div className="space-y-2">
-                        <Label>Correct Answers (Select all that apply)</Label>
+                        <Label>Đáp án đúng (Chọn tất cả các đáp án phù hợp)</Label>
                         <div className="space-y-2">
                           {q.options.map((opt, optIndex) => (
                             <div key={optIndex} className="flex items-center space-x-2">
@@ -339,17 +339,17 @@ export function CreateTestPage() {
                     )}
                     {q.question_type === 'essay' && (
                       <div className="space-y-2">
-                        <Label>Essay Question</Label>
-                        <p className="text-sm text-muted-foreground">Students will provide written answers. No predefined correct answer needed.</p>
+                        <Label>Câu hỏi tự luận</Label>
+                        <p className="text-sm text-muted-foreground">Học sinh sẽ cung cấp câu trả lời bằng văn bản. Không cần đáp án đúng định trước.</p>
                       </div>
                     )}
                     <div className="space-y-2">
-                      <Label htmlFor={`q${q.localId}-explanation`}>Explanation (Optional)</Label>
-                      <Textarea id={`q${q.localId}-explanation`} placeholder="Explain why this is the correct answer..." value={q.explanation || ""} onChange={e => handleQuestionChange(q.localId, 'explanation', e.target.value)} />
+                      <Label htmlFor={`q${q.localId}-explanation`}>Giải thích (Tùy chọn)</Label>
+                      <Textarea id={`q${q.localId}-explanation`} placeholder="Giải thích tại sao đây là đáp án đúng..." value={q.explanation || ""} onChange={e => handleQuestionChange(q.localId, 'explanation', e.target.value)} />
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="space-y-2">
-                        <Label htmlFor={`q${q.localId}-image`}>Attach Image (Max 500MB)</Label>
+                        <Label htmlFor={`q${q.localId}-image`}>Đính kèm hình ảnh (Tối đa 500MB)</Label>
                         <div className="flex items-center gap-2">
                           <ImageIcon className="h-5 w-5 text-muted-foreground" />
                           <Input id={`q${q.localId}-image`} type="file" accept="image/*" className="text-xs" onChange={e => handleFileChange(q.localId, 'image', e.target.files ? e.target.files[0] : null)} />
@@ -362,12 +362,12 @@ export function CreateTestPage() {
                         )}
                         {q.image_url && !q.image_file && (
                           <div className="mt-2">
-                            <p className="text-xs text-muted-foreground flex items-center gap-1"><ImageIcon className="h-3 w-3" /> Image attached</p>
+                            <p className="text-xs text-muted-foreground flex items-center gap-1"><ImageIcon className="h-3 w-3" /> Hình ảnh đã đính kèm</p>
                           </div>
                         )}
                       </div>
                       <div className="space-y-2">
-                        <Label htmlFor={`q${q.localId}-audio`}>Attach Audio File</Label>
+                        <Label htmlFor={`q${q.localId}-audio`}>Đính kèm tệp âm thanh</Label>
                         <div className="flex items-center gap-2">
                           <FileAudio className="h-5 w-5 text-muted-foreground" />
                           <Input id={`q${q.localId}-audio`} type="file" accept="audio/*" className="text-xs" onChange={e => handleFileChange(q.localId, 'audio', e.target.files ? e.target.files[0] : null)} />
@@ -380,18 +380,18 @@ export function CreateTestPage() {
                         )}
                         {q.audio_url && !q.audio_file && (
                           <div className="mt-2">
-                            <p className="text-xs text-muted-foreground flex items-center gap-1"><FileAudio className="h-3 w-3" /> Audio attached</p>
+                            <p className="text-xs text-muted-foreground flex items-center gap-1"><FileAudio className="h-3 w-3" /> Âm thanh đã đính kèm</p>
                           </div>
                         )}
                       </div>
                     </div>
                   </div>
                 ))}
-                <Button type="button" variant="outline" onClick={addQuestion}><PlusCircle className="mr-2 h-4 w-4" /> Add Question</Button>
+                <Button type="button" variant="outline" onClick={addQuestion}><PlusCircle className="mr-2 h-4 w-4" /> Thêm câu hỏi</Button>
               </div>
 
               <div className="flex justify-end">
-                <Button type="submit" disabled={isLoading}>{isLoading ? "Saving..." : "Save and Submit for Review"}</Button>
+                <Button type="submit" disabled={isLoading}>{isLoading ? "Đang lưu..." : "Lưu và gửi để xem xét"}</Button>
               </div>
             </form>
           </CardContent>
