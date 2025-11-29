@@ -72,6 +72,8 @@ export const mapExamToTest = (exam: ExamDTO): Test => {
     questions,
     createdBy: exam.created_by,
     createdAt: exam.created_at,
+    shuffleQuestions: exam.shuffle_questions || false,
+    shuffleOptions: exam.shuffle_options || false,
   }
 }
 

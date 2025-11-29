@@ -1,9 +1,3 @@
-import type { ReactNode } from "react"
-
-export interface ThemeProviderProps {
-  children: ReactNode
-}
-
-export function ThemeProvider({ children }: ThemeProviderProps) {
-  return <>{children}</>
-}
+// Re-export from theme-context for backward compatibility
+export { ThemeProvider, useTheme, type Theme } from "@/contexts/theme-context"
+export type { ThemeProviderProps } from "@/contexts/theme-context"

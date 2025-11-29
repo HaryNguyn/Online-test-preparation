@@ -49,6 +49,8 @@ CREATE TABLE IF NOT EXISTS Exams (
     total_marks INT NOT NULL,
     passing_marks INT NOT NULL,
     status ENUM('draft', 'pending', 'published', 'archived', 'rejected') DEFAULT 'draft',
+    shuffle_questions BOOLEAN DEFAULT FALSE COMMENT 'Whether to shuffle question order for students',
+    shuffle_options BOOLEAN DEFAULT FALSE COMMENT 'Whether to shuffle option order for each question',
     created_by VARCHAR(36) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,

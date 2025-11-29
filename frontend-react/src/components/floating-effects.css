@@ -1,0 +1,157 @@
+/* Floating Effects - Parallax & 3D */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px) translateZ(0);
+  }
+  50% {
+    transform: translateY(-20px) translateZ(0);
+  }
+}
+
+@keyframes floatSlow {
+  0%, 100% {
+    transform: translateY(0px) translateZ(0);
+  }
+  50% {
+    transform: translateY(-15px) translateZ(0);
+  }
+}
+
+@keyframes floatReverse {
+  0%, 100% {
+    transform: translateY(0px) translateZ(0);
+  }
+  50% {
+    transform: translateY(20px) translateZ(0);
+  }
+}
+
+@keyframes rotate3D {
+  0%, 100% {
+    transform: perspective(1000px) rotateY(0deg) rotateX(0deg);
+  }
+  25% {
+    transform: perspective(1000px) rotateY(2deg) rotateX(1deg);
+  }
+  50% {
+    transform: perspective(1000px) rotateY(0deg) rotateX(0deg);
+  }
+  75% {
+    transform: perspective(1000px) rotateY(-2deg) rotateX(-1deg);
+  }
+}
+
+@keyframes parallaxFloat {
+  0%, 100% {
+    transform: translateY(0px) translateX(0px) translateZ(0);
+  }
+  33% {
+    transform: translateY(-10px) translateX(5px) translateZ(0);
+  }
+  66% {
+    transform: translateY(5px) translateX(-5px) translateZ(0);
+  }
+}
+
+/* Floating Elements */
+.floating-element {
+  animation: float 6s ease-in-out infinite;
+  will-change: transform;
+}
+
+.floating-element-slow {
+  animation: floatSlow 8s ease-in-out infinite;
+  will-change: transform;
+}
+
+.floating-element-reverse {
+  animation: floatReverse 7s ease-in-out infinite;
+  will-change: transform;
+}
+
+.floating-3d {
+  animation: rotate3D 10s ease-in-out infinite;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+.floating-parallax {
+  animation: parallaxFloat 9s ease-in-out infinite;
+  will-change: transform;
+}
+
+/* Parallax on Scroll */
+.parallax-container {
+  position: relative;
+  overflow: hidden;
+}
+
+.parallax-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  will-change: transform;
+}
+
+.parallax-background {
+  transform: translateZ(0);
+  will-change: transform;
+}
+
+.parallax-foreground {
+  transform: translateZ(0);
+  will-change: transform;
+}
+
+/* 3D Card Effect */
+.card-3d {
+  transform-style: preserve-3d;
+  transition: transform 0.3s ease;
+  will-change: transform;
+}
+
+.card-3d:hover {
+  transform: perspective(1000px) rotateY(5deg) rotateX(-5deg) translateZ(20px);
+}
+
+/* Glassmorphism with floating */
+.glass-floating {
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  animation: float 6s ease-in-out infinite;
+  will-change: transform;
+}
+
+/* Text floating effect */
+.text-floating {
+  animation: floatSlow 8s ease-in-out infinite;
+  will-change: transform;
+  display: inline-block;
+}
+
+/* Smooth transitions */
+.floating-element,
+.floating-element-slow,
+.floating-element-reverse,
+.floating-3d,
+.floating-parallax {
+  transition: transform 0.3s ease;
+}
+
+/* Performance optimization */
+.floating-element,
+.floating-element-slow,
+.floating-element-reverse,
+.floating-3d,
+.floating-parallax,
+.parallax-layer {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+}
+

@@ -193,7 +193,7 @@ const submissionController = {
             }
             
             const submission = submissions[0];
-            console.log('📤 Raw submission.answers from DB:', submission.answers, 'Type:', typeof submission.answers);
+            //console.log('📤 Raw submission.answers from DB:', submission.answers, 'Type:', typeof submission.answers);
             
             if (submission.answers) {
                 // MySQL may already parse JSON columns, check type first

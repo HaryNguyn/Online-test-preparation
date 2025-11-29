@@ -1,6 +1,9 @@
 import { useAuth } from "@/contexts/auth-context.tsx"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { LogOut, KeyRound, User, Video, ArrowLeft, Sun, Moon, Monitor } from "lucide-react"
+import { Link, useNavigate, useLocation } from "react-router-dom"
+import { useTheme } from "@/contexts/theme-context"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,11 +12,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { LogOut, KeyRound, User, Video, ArrowLeft } from "lucide-react"
-import { Link, useNavigate, useLocation } from "react-router-dom"
 
 export function DashboardHeader() {
   const { user, logout } = useAuth()
+  const { theme, setTheme, resolvedTheme } = useTheme()
   const navigate = useNavigate()
   const location = useLocation()
 
@@ -62,6 +64,38 @@ export function DashboardHeader() {
               </Button>
             </Link>
           )}
+          
+          {/* Theme Toggle */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" className="h-9 w-9">
+                {resolvedTheme === "dark" ? (
+                  <Moon className="h-4 w-4" />
+                ) : (
+                  <Sun className="h-4 w-4" />
+                )}
+                <span className="sr-only">Chuyển đổi theme</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => setTheme("light")}>
+                <Sun className="mr-2 h-4 w-4" />
+                <span>Sáng</span>
+                {theme === "light" && <span className="ml-auto">✓</span>}
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setTheme("dark")}>
+                <Moon className="mr-2 h-4 w-4" />
+                <span>Tối</span>
+                {theme === "dark" && <span className="ml-auto">✓</span>}
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setTheme("system")}>
+                <Monitor className="mr-2 h-4 w-4" />
+                <span>Theo hệ thống</span>
+                {theme === "system" && <span className="ml-auto">✓</span>}
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="relative h-10 w-10 rounded-full">

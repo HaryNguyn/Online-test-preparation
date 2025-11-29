@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label"
 import { Progress } from "@/components/ui/progress"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Switch } from "@/components/ui/switch"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert" 
 import { PlusCircle, Trash2, AlertCircle, Image as ImageIcon, Paperclip } from "lucide-react"
 import { FileAudio } from "lucide-react"
@@ -72,6 +73,8 @@ export function CreateTestPage() {
   const [subject, setSubject] = useState("")
   const [gradeLevel, setGradeLevel] = useState("")
   const [duration, setDuration] = useState(30)
+  const [shuffleQuestions, setShuffleQuestions] = useState(false)
+  const [shuffleOptions, setShuffleOptions] = useState(false)
   const [questions, setQuestions] = useState<Question[]>([
     {
       localId: Date.now(), question_text: "", question_type: 'multiple_choice_single', options: ["", "", "", ""], correct_answer: 0, explanation: "",
@@ -94,6 +97,8 @@ export function CreateTestPage() {
           setSubject(exam.subject || "")
           setGradeLevel(exam.grade_level || "")
           setDuration(exam.duration)
+          setShuffleQuestions(exam.shuffle_questions || false)
+          setShuffleOptions(exam.shuffle_options || false)
           setQuestions((exam.questions || []).map((q) => ({
             localId: q.id, // Use the actual question ID from backend
             question_text: q.question_text,
@@ -211,6 +216,8 @@ export function CreateTestPage() {
           duration,
           created_by: user?.id,
           status: 'pending', // Always submit for review on save
+          shuffle_questions: shuffleQuestions,
+          shuffle_options: shuffleOptions,
           questions: processedQuestions,
       }
 
@@ -266,6 +273,43 @@ export function CreateTestPage() {
                   <div className="space-y-2"><Label htmlFor="duration">Thời lượng (phút)</Label><Input id="duration" type="number" value={duration} onChange={e => setDuration(Number(e.target.value))} required /></div>
                 </div>
                 <div className="space-y-2"><Label htmlFor="description">Mô tả</Label><Textarea id="description" value={description} onChange={e => setDescription(e.target.value)} /></div>
+                
+                {/* Shuffle Settings */}
+                <div className="space-y-4 rounded-lg border p-4 bg-muted/50">
+                  <h4 className="text-sm font-medium">Cài đặt trộn câu hỏi</h4>
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className="space-y-0.5">
+                        <Label htmlFor="shuffle-questions" className="text-sm font-normal">
+                          Trộn thứ tự câu hỏi
+                        </Label>
+                        <p className="text-xs text-muted-foreground">
+                          Khi bật, thứ tự câu hỏi sẽ được trộn ngẫu nhiên cho mỗi học sinh
+                        </p>
+                      </div>
+                      <Switch
+                        id="shuffle-questions"
+                        checked={shuffleQuestions}
+                        onCheckedChange={setShuffleQuestions}
+                      />
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <div className="space-y-0.5">
+                        <Label htmlFor="shuffle-options" className="text-sm font-normal">
+                          Trộn thứ tự đáp án
+                        </Label>
+                        <p className="text-xs text-muted-foreground">
+                          Khi bật, thứ tự các lựa chọn sẽ được trộn ngẫu nhiên cho mỗi câu hỏi
+                        </p>
+                      </div>
+                      <Switch
+                        id="shuffle-options"
+                        checked={shuffleOptions}
+                        onCheckedChange={setShuffleOptions}
+                      />
+                    </div>
+                  </div>
+                </div>
               </div>
 
               {/* Questions */}

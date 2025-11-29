@@ -24,6 +24,70 @@ import { mapExamToTest } from "@/lib/mappers"
 import type { Test } from "@/lib/types"
 import { Clock, CheckCircle2, AlertCircle } from "lucide-react"
 
+/**
+ * Shuffle array using Fisher-Yates algorithm
+ */
+function shuffleArray<T>(array: T[]): T[] {
+  const shuffled = [...array]
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1))
+    ;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
+  }
+  return shuffled
+}
+
+/**
+ * Apply shuffling to test questions and/or options based on exam settings
+ */
+function applyShuffling(test: Test): Test {
+  let questions = [...test.questions]
+  
+  // Shuffle question order if enabled
+  if (test.shuffleQuestions) {
+    questions = shuffleArray(questions)
+  }
+  
+  // Shuffle options for each question if enabled
+  if (test.shuffleOptions) {
+    questions = questions.map((q) => {
+      if (q.questionType === 'essay') {
+        // Essays don't have options to shuffle
+        return q
+      }
+      
+      const originalOptions = [...q.options]
+      const shuffledOptions = shuffleArray(originalOptions)
+      
+      // Map correct answer indices to new positions
+      let newCorrectAnswer: number | number[] | null = null
+      
+      if (q.questionType === 'multiple_choice_single' && typeof q.correctAnswer === 'number') {
+        // Find the correct option text
+        const correctOptionText = originalOptions[q.correctAnswer]
+        // Find its new position in shuffled array
+        newCorrectAnswer = shuffledOptions.indexOf(correctOptionText)
+      } else if (q.questionType === 'multiple_choice_multiple' && Array.isArray(q.correctAnswer)) {
+        // Map each correct answer index to new position
+        newCorrectAnswer = q.correctAnswer.map((originalIndex) => {
+          const correctOptionText = originalOptions[originalIndex]
+          return shuffledOptions.indexOf(correctOptionText)
+        }).filter((idx) => idx !== -1) // Remove any invalid mappings
+      }
+      
+      return {
+        ...q,
+        options: shuffledOptions,
+        correctAnswer: newCorrectAnswer,
+      }
+    })
+  }
+  
+  return {
+    ...test,
+    questions,
+  }
+}
+
 export function TestDetailPage() {
   const { user, isLoading } = useAuth()
   const navigate = useNavigate()
@@ -53,7 +117,13 @@ export function TestDetailPage() {
     const loadTest = async () => {
       try {
         const { exam } = await api.getExam(testId)
-        const mapped = mapExamToTest(exam)
+        let mapped = mapExamToTest(exam)
+        
+        // Apply shuffling if enabled
+        if (mapped.shuffleQuestions || mapped.shuffleOptions) {
+          mapped = applyShuffling(mapped)
+        }
+        
         const durationMinutes = Number(mapped.duration) || Math.max(mapped.questions.length * 2, 1)
 
         if (mounted) {

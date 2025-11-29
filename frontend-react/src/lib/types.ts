@@ -46,6 +46,8 @@ export interface ExamDTO {
   total_marks?: number | null
   passing_marks?: number | null
   status?: string | null
+  shuffle_questions?: boolean | null
+  shuffle_options?: boolean | null
   created_by: string
   created_at: string
   questions?: ExamQuestionDTO[] | null
@@ -82,6 +84,8 @@ export interface Test {
   questions: Question[]
   createdBy: string
   createdAt: string
+  shuffleQuestions?: boolean
+  shuffleOptions?: boolean
 }
 
 export interface TestResult {

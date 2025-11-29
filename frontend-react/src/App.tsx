@@ -21,6 +21,7 @@ import { ProfilePage } from "@/pages/profile"
 import { AdminPage } from "@/pages/admin.tsx"
 import { useAuth } from "@/contexts/auth-context"
 import type { UserRole } from "@/lib/types"
+import { Chatbot } from "@/components/chatbot"
 
 const LazyNotFound = lazy(() => import("@/pages/not-found"))
 
@@ -182,6 +183,9 @@ function App() {
         />
         <Route path="*" element={<LazyNotFound />} />
       </Routes>
+      
+      {/* Chatbot - Available on all pages */}
+      <Chatbot />
     </Suspense>
   )
 }

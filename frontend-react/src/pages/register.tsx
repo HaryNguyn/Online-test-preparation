@@ -85,7 +85,7 @@ export function RegisterPage() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-muted/30 px-4 py-8">
       <div className="mb-8 flex items-center gap-2">
-        <img src="/hnue-logo.png" alt="HNUE Logo" className="h-8 w-8" width={32} height={32} />
+        <img src="src/public/hnue-logo.png" alt="HNUE Logo" className="h-8 w-8" width={32} height={32} />
         <span className="text-2xl font-semibold text-foreground">ExamPrep</span>
       </div>
 

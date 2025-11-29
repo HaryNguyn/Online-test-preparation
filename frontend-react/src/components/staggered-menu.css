@@ -41,7 +41,7 @@
 
 .sm-logo-img {
   display: block;
-  height: 32px;
+  height: 90px;
   width: auto;
   object-fit: contain;
 }
@@ -54,10 +54,11 @@
   background: transparent;
   border: none;
   cursor: pointer;
-  color: #e9e9ef;
+  color: #eaeaf0;
   font-weight: 500;
   line-height: 1;
   overflow: visible;
+  size: 500px;
 }
 
 .sm-toggle:focus-visible {
@@ -90,6 +91,9 @@
   display: block;
   height: 1em;
   line-height: 1;
+  font-size: 1.3rem;
+  font-weight: 500;
+  transform: translateY(-5px);
 }
 
 .sm-icon {

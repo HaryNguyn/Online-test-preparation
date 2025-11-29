@@ -98,7 +98,7 @@ const examController = {
     createExam: async (req, res) => {
         try {
             console.log('Received req.body:', JSON.stringify(req.body, null, 2));
-            const { title, description, subject, grade_level, duration, total_marks, passing_marks, questions, created_by, status } = req.body;
+            const { title, description, subject, grade_level, duration, total_marks, passing_marks, questions, created_by, status, shuffle_questions, shuffle_options } = req.body;
 
             console.log('Extracted fields:', { title, duration, created_by });
 
@@ -110,8 +110,8 @@ const examController = {
             const examId = uuidv4();
 
             await connection.query(
-                'INSERT INTO Exams (id, title, description, subject, grade_level, duration, total_marks, passing_marks, status, created_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-                [examId, title, description, subject, grade_level, duration, total_marks || 0, passing_marks || 0, status || 'draft', created_by]
+                'INSERT INTO Exams (id, title, description, subject, grade_level, duration, total_marks, passing_marks, status, created_by, shuffle_questions, shuffle_options) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+                [examId, title, description, subject, grade_level, duration, total_marks || 0, passing_marks || 0, status || 'draft', created_by, shuffle_questions || false, shuffle_options || false]
             );
 
             // Insert questions
