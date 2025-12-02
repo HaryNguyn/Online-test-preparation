@@ -111,10 +111,10 @@ export function LoginPage() {
             <div className="space-y-2 rounded-lg bg-muted p-4 text-sm">
               <p className="font-medium text-foreground">Thử các tài khoản demo này:</p>
               <div className="space-y-1 text-muted-foreground">
-                <p>Admin: admin@example.com / password123</p>
+                {/* <p>Admin: admin@example.com / password123</p>
                 <p>Student: student@example.com / password123</p>
-                <p>Teacher: teacher@example.com / password123</p>
-                <p>Parent: parent@example.com / password123</p>
+                <p>Teacher: teacher@example.com / password123</p> */}
+                <p> parent@example.com / password123</p>
               </div>
             </div>
           </div>

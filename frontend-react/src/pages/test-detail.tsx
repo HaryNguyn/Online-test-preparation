@@ -102,6 +102,7 @@ export function TestDetailPage() {
   const [showSubmitDialog, setShowSubmitDialog] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [dataSource, setDataSource] = useState<"backend" | "local">("backend")
+  const [tabLeaveCount, setTabLeaveCount] = useState(0)
 
   useEffect(() => {
     if (!isLoading && !user) {
@@ -244,6 +245,35 @@ export function TestDetailPage() {
     return () => clearInterval(timer)
   }, [isStarted, handleSubmit])
 
+  // Phát hiện chuyển sang tab khác và cảnh báo / tự động nộp bài
+  useEffect(() => {
+    if (!isStarted) return
+
+    const MAX_TAB_LEAVES = 3
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        setTabLeaveCount((prev) => {
+          const next = prev + 1
+
+          if (next === 1) {
+            window.alert("Bạn đã rời khỏi màn hình làm bài. Vui lòng tập trung vào bài kiểm tra.")
+          } else if (next >= MAX_TAB_LEAVES) {
+            window.alert("Bạn đã rời khỏi màn hình quá nhiều lần. Bài sẽ được nộp tự động.")
+            handleSubmit(timeRemaining)
+          }
+
+          return next
+        })
+      }
+    }
+
+    document.addEventListener("visibilitychange", handleVisibilityChange)
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange)
+    }
+  }, [isStarted, handleSubmit, timeRemaining])
+  //
   const handleStartTest = () => {
     setIsStarted(true)
   }

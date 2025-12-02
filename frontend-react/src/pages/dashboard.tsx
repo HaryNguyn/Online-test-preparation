@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useMemo, useState, useCallback } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { useAuth } from "@/contexts/auth-context"
 // import { ExamMenu } from "@/components/exam-menu"
@@ -10,17 +10,61 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { api } from "@/lib/api"
 import { mapExamToTest } from "@/lib/mappers"
-import type { Test, TestResult } from "@/lib/types"
+import type { Test, TestResult, SubmissionDTO } from "@/lib/types"
 import { BookOpen, Clock, Trophy, TrendingUp, Search, Filter } from "lucide-react"
+
+type DashboardResult = TestResult & { totalMarks?: number; percentage?: number }
 
 export function DashboardPage() {
   const { user, isLoading } = useAuth()
   const navigate = useNavigate()
   const [tests, setTests] = useState<Test[]>([])
-  const [results, setResults] = useState<TestResult[]>([])
+  const [results, setResults] = useState<DashboardResult[]>([])
   const [searchQuery, setSearchQuery] = useState("")
   const [subjectFilter, setSubjectFilter] = useState("all")
   const [gradeFilter, setGradeFilter] = useState("all")
+
+  const mapSubmissionToResult = useCallback((sub: SubmissionDTO): DashboardResult => {
+    const answersArray = Array.isArray(sub.answers)
+      ? sub.answers
+      : sub.answers && typeof sub.answers === "object"
+        ? Object.values(sub.answers)
+        : []
+
+    return {
+      id: sub.id,
+      userId: sub.student_id,
+      testId: sub.exam_id,
+      answers: answersArray as DashboardResult["answers"],
+      score: Number(sub.score) || 0,
+      // totalQuestions is not used for percentage on dashboard; keep a sane fallback
+      totalQuestions: answersArray.length || 0,
+      timeTaken: Number(sub.time_taken) || 0,
+      completedAt: sub.submitted_at,
+      totalMarks: sub.total_marks ?? undefined,
+      percentage: sub.percentage !== null && sub.percentage !== undefined ? Number(sub.percentage) : undefined,
+    }
+  }, [])
+
+  const getResultPercentage = useCallback((result: DashboardResult): number => {
+    // Ưu tiên dùng percentage từ backend nếu có
+    if (result.percentage !== undefined) {
+      return Math.min(100, Math.max(0, result.percentage))
+    }
+
+    // Nếu có totalMarks thì tính theo điểm / tổng điểm
+    if (result.totalMarks && result.totalMarks > 0) {
+      const percentage = (result.score / result.totalMarks) * 100
+      return Math.min(100, Math.max(0, percentage))
+    }
+
+    // Fallback: giả sử mỗi câu 10 điểm
+    const marksPerQuestion = 10
+    const totalMarks = result.totalQuestions * marksPerQuestion
+    if (!totalMarks || totalMarks === 0) return 0
+    const percentage = (result.score / totalMarks) * 100
+    return Math.min(100, Math.max(0, percentage))
+  }, [])
 
   useEffect(() => {
     if (!isLoading) {
@@ -41,37 +85,28 @@ export function DashboardPage() {
           const [examsRes, submissionsRes] = await Promise.all([
             api.getExams({ status: "published" }),
             api.getStudentSubmissions(user.id)
-          ]);
-          setTests(examsRes.exams.map(mapExamToTest));
-          setResults(submissionsRes.submissions.map(sub => ({
-            id: sub.id,
-            userId: sub.student_id,
-            testId: sub.exam_id,
-            answers: Array.isArray(sub.answers) ? sub.answers : [],
-            score: sub.score,
-            totalQuestions: (sub.total_marks ?? 0) / 10,
-            timeTaken: sub.time_taken ?? 0,
-            completedAt: sub.submitted_at
-          } as TestResult)));
+          ])
+          setTests(examsRes.exams.map(mapExamToTest))
+          setResults(submissionsRes.submissions.map(mapSubmissionToResult))
         } catch (error) {
-          console.error("Failed to load dashboard data:", error);
+          console.error("Failed to load dashboard data:", error)
         }
-      };
-      loadData();
+      }
+      loadData()
     }
-  }, [user])
+  }, [user, mapSubmissionToResult])
 
   const stats = useMemo(() => {
     const totalTestsTaken = results.length
+    const percentages = results.map((result) => getResultPercentage(result))
     const averageScore =
-      results.length > 0
-        ? Math.round(results.reduce((acc, result) => acc + (result.score / result.totalQuestions) * 100, 0) / results.length)
+      percentages.length > 0
+        ? Math.round(percentages.reduce((acc, value) => acc + value, 0) / percentages.length)
         : 0
-    const bestScore =
-      results.length > 0 ? Math.max(...results.map((result) => (result.score / result.totalQuestions) * 100)) : 0
+    const bestScore = percentages.length > 0 ? Math.max(...percentages) : 0
 
     return { totalTestsTaken, averageScore, bestScore }
-  }, [results])
+  }, [results, getResultPercentage])
 
   const filteredTests = useMemo(() => {
     return tests.filter((test) => {
@@ -249,7 +284,7 @@ export function DashboardPage() {
                       {hasCompleted && userResult && (
                         <div className="mb-4 rounded-lg bg-muted p-3">
                           <p className="text-sm font-medium text-foreground">
-                            Điểm của bạn: {((userResult.score / userResult.totalQuestions) * 100).toFixed(0)}%
+                            Điểm của bạn: {getResultPercentage(userResult).toFixed(0)}%
                           </p>
                         </div>
                       )}

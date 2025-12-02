@@ -71,3 +71,10 @@ export default defineConfig([
   },
 ])
 ```
+## MK Dang nhapnhap
+## student@example.com pass Hai12345@
+## teacher@example.com pass Haha12345@
+## stu725105059@hnue.edu.vn pass Haibeo2004@
+## admin@example.com pass password123
+## parent@example.com / password123
+## science.teacher@example.com / Haij12345@
