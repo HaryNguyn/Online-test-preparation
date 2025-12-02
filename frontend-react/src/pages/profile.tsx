@@ -171,7 +171,7 @@ export function ProfilePage() {
           <Button asChild variant="ghost" size="sm" className="mb-4">
             <Link to="/dashboard">
               <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Dashboard
+              Quay lại trang chính
             </Link>
           </Button>
           <h1 className="mb-2 text-3xl font-bold text-foreground">Cài đặt trang cá nhân</h1>

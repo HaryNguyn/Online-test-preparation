@@ -42,28 +42,42 @@ export function TeacherPage() {
     }
   }, [user, isAuthLoading, navigate])
 
+  // Load exams created by this teacher + pending submissions list
   useEffect(() => {
-    if (user?.id) {
-      api.getExams({ created_by: user.id })
-        .then(response => setExams(response.exams))
-        .catch(err => console.error("Failed to fetch exams:", err))
-        .finally(() => setIsLoading(false))
+    if (!user?.id) return
 
-      api.getPendingSubmissions()
-        .then(response => setPendingSubmissions(response.submissions))
-        .catch(err => console.error("Failed to fetch pending submissions:", err))
-        .finally(() => setIsPendingLoading(false))
+    api.getExams({ created_by: user.id })
+      .then(response => setExams(response.exams))
+      .catch(err => console.error("Failed to fetch exams:", err))
+      .finally(() => setIsLoading(false))
 
-      // Load all submissions for statistics
-      Promise.all(
-        exams.map(exam => api.getExamSubmissions(exam.id).catch(() => ({ submissions: [] })))
-      ).then(results => {
+    api.getPendingSubmissions()
+      .then(response => setPendingSubmissions(response.submissions))
+      .catch(err => console.error("Failed to fetch pending submissions:", err))
+      .finally(() => setIsPendingLoading(false))
+  }, [user?.id])
+
+  // Khi đã có danh sách đề thi, load tất cả submissions cho phần thống kê
+  useEffect(() => {
+    if (!user?.id || exams.length === 0) {
+      setAllSubmissions([])
+      setIsStatsLoading(false)
+      return
+    }
+
+    setIsStatsLoading(true)
+    Promise.all(
+      exams.map(exam =>
+        api.getExamSubmissions(exam.id).catch(() => ({ submissions: [] as SubmissionDTO[] })),
+      ),
+    )
+      .then(results => {
         const combined = results.flatMap(r => r.submissions)
         setAllSubmissions(combined)
-      }).catch(err => console.error("Failed to fetch submissions for stats:", err))
-        .finally(() => setIsStatsLoading(false))
-    }
-  }, [user?.id])
+      })
+      .catch(err => console.error("Failed to fetch submissions for stats:", err))
+      .finally(() => setIsStatsLoading(false))
+  }, [user?.id, exams])
 
   const handleEditExam = (examId: string) => {
     navigate(`/teacher/edit-test/${examId}`)
