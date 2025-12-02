@@ -12,13 +12,13 @@ const getUserById = async (userId) => {
     return user;
 
 }
-const getUpdateUserById = async (email, name, city, userId) => {
+const getUpdateUserById = async (email, name, role, grade, userId) => {
     let [results, fields] = await connection.query(
         `
         UPDATE Users
-        SET email = ?, name = ?, city = ?
+        SET email = ?, name = ?, role = ?, grade = ?
         WHERE id = ?
-        `, [email, name, city, userId]
+        `, [email, name, role, grade, userId]
 
     );
 

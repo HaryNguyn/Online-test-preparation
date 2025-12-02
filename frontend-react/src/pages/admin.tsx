@@ -13,7 +13,6 @@ import { MoreHorizontal, PlusCircle, User, ShieldCheck, FileText, AlertCircle } 
 import { UserFormDialog } from "@/components/user-form-dialog" 
 import type { User as UserType, ExamDTO } from "@/lib/types"
 import { api } from "@/lib/api"
-import { storage } from "@/lib/storage"
 import { Spinner } from "@/components/ui/spinner"
 
 type ApiUser = UserType & { id: string } 
@@ -36,14 +35,14 @@ export function AdminPage() {
       return
     }
 
-    const fetchUsers = () => {
+    const fetchUsers = async () => {
       try {
         setIsLoadingUsers(true)
         setErrorUsers(null)
-        const storedUsers = storage.getUsers()
-        setUsers(storedUsers as ApiUser[])
+        const response = await api.getAllUsers()
+        setUsers(response.users as ApiUser[])
       } catch (err) {
-        setErrorUsers((err as Error).message || "Failed to load users from storage.")
+        setErrorUsers((err as Error).message || "Failed to load users from database.")
       } finally {
         setIsLoadingUsers(false)
       }
@@ -88,9 +87,8 @@ export function AdminPage() {
     if (!window.confirm("Are you sure you want to delete this user?")) return
 
     try {
-      const nextUsers = users.filter((u) => u.id !== userId)
-      storage.saveUsers(nextUsers)
-      setUsers(nextUsers)
+      await api.deleteUser(userId)
+      setUsers(prevUsers => prevUsers.filter((u) => u.id !== userId))
     } catch (err) {
       alert((err as Error).message || "Failed to delete user.")
     }
@@ -100,30 +98,32 @@ export function AdminPage() {
     try {
       const isNew = !savedUser.id || !users.some(u => u.id === savedUser.id)
       if (isNew) {
-        // Call the actual register API instead of saving to local storage
+        // Create new user via API
         const payload = {
           email: savedUser.email,
           password: savedUser.password || Math.random().toString(36).slice(2, 10),
           name: savedUser.name,
           role: savedUser.role,
+          grade: savedUser.grade,
         }
-        const { user: newUser } = await api.register(payload)
-        // We need to fetch all users again from a real API if we want this to be robust.
-        // For now, just add to the local state. A real app would have a GET /api/users endpoint.
-        setUsers(prevUsers => [newUser as ApiUser, ...prevUsers]);
+        const { user: newUser } = await api.createUser(payload)
+        setUsers(prevUsers => [newUser as ApiUser, ...prevUsers])
       } else {
-        // This part would call an "update user" API endpoint.
-        // For now, it updates local state which is not ideal but works for the demo.
-        // A proper implementation would require a PUT /api/users/:id endpoint.
-        console.warn("User update is not implemented on the backend. Updating local state only.");
-        const updatedUsers = users.map((u) => (u.id === savedUser.id ? { ...u, ...savedUser } : u));
-        storage.saveUsers(updatedUsers); // Keep this for now to persist edits locally
-        setUsers(updatedUsers);
+        // Update existing user via API
+        const payload: any = {
+          name: savedUser.name,
+          email: savedUser.email,
+          role: savedUser.role,
+          grade: savedUser.grade,
+        }
+        if (savedUser.password) {
+          payload.password = savedUser.password
+        }
+        const { user: updatedUser } = await api.updateUser(savedUser.id, payload)
+        setUsers(prevUsers => prevUsers.map((u) => (u.id === savedUser.id ? updatedUser as ApiUser : u)))
       }
     } catch (err) {
-      // The dialog will show its own error, but we can log it here.
       console.error("Failed to save user:", err)
-      // Re-throw to be caught by the dialog form
       throw err
     }
   }

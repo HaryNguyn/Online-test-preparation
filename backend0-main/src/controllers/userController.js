@@ -59,7 +59,7 @@ const userController = {
     updateUser: async (req, res) => {
         try {
             const { id } = req.params;
-            const { name, email, role, grade, avatar_url } = req.body;
+            const { name, email, role, grade, avatar_url, password } = req.body;
 
             // Get current user to preserve existing values
             const [currentUser] = await connection.query(
@@ -106,6 +106,11 @@ const userController = {
             if (grade !== undefined) {
                 updateFields.push('grade = ?');
                 updateValues.push(role === 'student' ? grade : null);
+            }
+            if (password !== undefined) {
+                const hashedPassword = await bcrypt.hash(password, 10);
+                updateFields.push('password = ?');
+                updateValues.push(hashedPassword);
             }
 
             if (updateFields.length === 0) {

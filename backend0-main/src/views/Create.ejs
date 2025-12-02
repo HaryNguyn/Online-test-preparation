@@ -1,35 +1,57 @@
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create new user</title>
-    <link rel="stylesheet" href=" /css/style.css">
+    <title>Create New User</title>
+    <link rel="stylesheet" href="/css/style.css">
 </head>
 
 <body>
     <div class="topnav">
-        <a  href="/">Home</a>
+        <a href="/">Home</a>
         <a class="active" href="/create">Create Users</a>
     </div>
+    
     <div class="form">
         <form action="/create-users" method="POST">
             <fieldset>
-                <legend>Add new users</legend>
+                <legend>Add New User</legend>
 
                 <div class="input-group">
-                    <label for="">Email:</label>
-                    <input type="text" name="email">
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" name="email" required placeholder="user@example.com">
                 </div>
+                
                 <div class="input-group">
-                    <label for="">Name:</label>
-                    <input type="text" name="myname">
+                    <label for="name">Name:</label>
+                    <input type="text" id="name" name="myname" required placeholder="Full name">
                 </div>
+                
                 <div class="input-group">
-                    <label for="">City:</label>
-                    <input type="text" name="city">
+                    <label for="password">Password:</label>
+                    <input type="password" id="password" name="password" required minlength="8" placeholder="Min 8 characters">
+                    <small>Min 8 characters, include uppercase, lowercase, number & special character</small>
                 </div>
-                <button type="submit" class="btn-save">Save</button>
+                
+                <div class="input-group">
+                    <label for="role">Role:</label>
+                    <select id="role" name="role" required>
+                        <option value="">-- Select Role --</option>
+                        <option value="student">Student</option>
+                        <option value="teacher">Teacher</option>
+                        <option value="parent">Parent</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                </div>
+                
+                <div class="input-group">
+                    <label for="grade">Grade:</label>
+                    <input type="text" id="grade" name="grade" placeholder="e.g., Grade 10 (for students)">
+                </div>
+                
+                <button type="submit" class="btn-save">Create User</button>
             </fieldset>
         </form>
     </div>

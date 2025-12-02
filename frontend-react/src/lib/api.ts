@@ -180,4 +180,22 @@ export const api = {
     if (params.email) qs.set("email", params.email)
     return request<{ success: boolean; mapping?: any; error?: string }>(`/user-mapping/resolve?${qs.toString()}`)
   },
+
+  // User management APIs
+  getAllUsers: () => request<{ users: User[] }>(`/users`),
+
+  createUser: (payload: { email: string; password: string; name: string; role: string; grade?: string }) =>
+    request<{ message: string; user: User }>(`/users`, {
+      method: "POST",
+      body: JSON.stringify(payload),
+    }),
+
+  updateUser: (userId: string, payload: { name?: string; email?: string; role?: string; grade?: string; password?: string }) =>
+    request<{ message: string; user: User }>(`/users/${userId}`, {
+      method: "PUT",
+      body: JSON.stringify(payload),
+    }),
+
+  deleteUser: (userId: string) =>
+    request<{ message: string }>(`/users/${userId}`, { method: "DELETE" }),
 }

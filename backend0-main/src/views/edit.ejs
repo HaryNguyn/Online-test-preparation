@@ -1,42 +1,101 @@
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Update new user</title>
-    <link rel="stylesheet" href=" /css/style.css">
+    <title>Update User</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .password-section {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #ddd;
+        }
+        .checkbox-group {
+            margin-bottom: 10px;
+        }
+        .checkbox-group input[type="checkbox"] {
+            margin-right: 8px;
+        }
+    </style>
 </head>
 
 <body>
-
     <div class="topnav">
         <a href="/">Home</a>
-        <a href="/create" >Create Users</a>
+        <a href="/create">Create Users</a>
     </div>
+    
     <div class="form">
         <form action="/update-users" method="POST">
             <fieldset>
-                <legend>Update a user</legend>
+                <legend>Update User Information</legend>
+                
                 <div class="input-group d-none">
-                    <label for="">ID:</label>
-                    <input type="text" name="userId" value="<%=userEdit.id %>">
+                    <label for="userId">ID:</label>
+                    <input type="text" id="userId" name="userId" value="<%=userEdit.id %>">
                 </div>
+                
                 <div class="input-group">
-                    <label for="">Email:</label>
-                    <input type="text" name="email" value="<%=userEdit.email %>">
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" name="email" value="<%=userEdit.email %>" required>
                 </div>
+                
                 <div class="input-group">
-                    <label for="">Name:</label>
-                    <input type="text" name="myname" value="<%=userEdit.name %>">
+                    <label for="name">Name:</label>
+                    <input type="text" id="name" name="myname" value="<%=userEdit.name %>" required>
                 </div>
+                
                 <div class="input-group">
-                    <label for="">City:</label>
-                    <input type="text" name="city" value="<%=userEdit.city %>">
+                    <label for="role">Role:</label>
+                    <select id="role" name="role" required>
+                        <option value="student" <%=userEdit.role === 'student' ? 'selected' : '' %>>Student</option>
+                        <option value="teacher" <%=userEdit.role === 'teacher' ? 'selected' : '' %>>Teacher</option>
+                        <option value="parent" <%=userEdit.role === 'parent' ? 'selected' : '' %>>Parent</option>
+                        <option value="admin" <%=userEdit.role === 'admin' ? 'selected' : '' %>>Admin</option>
+                    </select>
                 </div>
-                <button type="submit" class="btn-save">Save</button>
+                
+                <div class="input-group">
+                    <label for="grade">Grade:</label>
+                    <input type="text" id="grade" name="grade" value="<%=userEdit.grade || '' %>" placeholder="e.g., Grade 10">
+                </div>
+                
+                <div class="password-section">
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="changePassword" name="changePassword" onchange="togglePassword()">
+                        <label for="changePassword">Change Password</label>
+                    </div>
+                    
+                    <div class="input-group" id="passwordField" style="display: none;">
+                        <label for="password">New Password:</label>
+                        <input type="password" id="password" name="password" minlength="8" placeholder="Enter new password">
+                        <small>Min 8 characters, include uppercase, lowercase, number & special character</small>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn-save">Save Changes</button>
             </fieldset>
         </form>
     </div>
+
+    <script>
+        function togglePassword() {
+            const checkbox = document.getElementById('changePassword');
+            const passwordField = document.getElementById('passwordField');
+            const passwordInput = document.getElementById('password');
+            
+            if (checkbox.checked) {
+                passwordField.style.display = 'block';
+                passwordInput.required = true;
+            } else {
+                passwordField.style.display = 'none';
+                passwordInput.required = false;
+                passwordInput.value = '';
+            }
+        }
+    </script>
 </body>
 
 </html>

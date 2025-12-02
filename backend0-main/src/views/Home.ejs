@@ -44,7 +44,6 @@
                 <th>ID</th>
                 <th>Email</th>
                 <th>Name</th>
-                <th>City</th>
                 <th>Action</th>
             </tr>
             
@@ -53,7 +52,6 @@
                     <td><%= users.id %></td>
                     <td><%= users.email %></td>
                     <td><%= users.name %></td>
-                    <td><%= users.city %></td>
                     <td>
                         <a href="/update/<%= users.id %>">Edit</a>
                         <form action="/delete-user/<%= users.id %>" method="POST">

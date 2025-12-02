@@ -78,3 +78,4 @@ export default defineConfig([
 ## admin@example.com pass password123
 ## parent@example.com / password123
 ## science.teacher@example.com / Haij12345@
+## math.teacher@example.com/Robe12345@1
