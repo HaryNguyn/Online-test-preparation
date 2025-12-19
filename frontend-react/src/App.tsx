@@ -22,6 +22,8 @@ import { AdminPage } from "@/pages/admin.tsx"
 import { useAuth } from "@/contexts/auth-context"
 import type { UserRole } from "@/lib/types"
 import { Chatbot } from "@/components/chatbot"
+import { NotificationContainer } from "@/components/notification-container"
+import { PageTransition } from "@/components/page-transition"
 
 const LazyNotFound = lazy(() => import("@/pages/not-found"))
 
@@ -184,7 +186,9 @@ function App() {
         <Route path="*" element={<LazyNotFound />} />
       </Routes>
       
-      {/* Chatbot - Available on all pages */}
+      {/* Global Components */}
+      <PageTransition />
+      <NotificationContainer />
       <Chatbot />
     </Suspense>
   )

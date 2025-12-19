@@ -7,6 +7,7 @@ const leaderboardController = require('../controllers/leaderboardController');
 const userMappingController = require('../controllers/userMappingController');
 const videoController = require('../controllers/videoController');
 const { upload, uploadController } = require('../controllers/uploadController');
+const documentParserController = require('../controllers/documentParserController');
 
 // Auth routes
 router.post('/auth/register', authController.register);
@@ -50,5 +51,8 @@ router.delete('/videos/:id', videoController.deleteVideo);
 
 // Thêm route mới để xử lý upload file
 router.post('/upload', upload.single('file'), uploadController.uploadFile);
+
+// Document parser route
+router.post('/parse-document', documentParserController.upload, documentParserController.parseDocument);
 
 module.exports = router;

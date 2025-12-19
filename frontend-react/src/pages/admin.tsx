@@ -14,6 +14,8 @@ import { UserFormDialog } from "@/components/user-form-dialog"
 import type { User as UserType, ExamDTO } from "@/lib/types"
 import { api } from "@/lib/api"
 import { Spinner } from "@/components/ui/spinner"
+import { useNotification } from "@/lib/notification-store"
+import { ConfirmDialog } from "@/components/confirm-dialog"
 
 type ApiUser = UserType & { id: string } 
 
@@ -28,6 +30,15 @@ export function AdminPage() {
   const [errorUsers, setErrorUsers] = useState<string | null>(null)
   const [isLoadingExams, setIsLoadingExams] = useState(true)
   const [errorExams, setErrorExams] = useState<string | null>(null)
+  const [confirmDialog, setConfirmDialog] = useState<{
+    open: boolean
+    title: string
+    description: string
+    onConfirm: () => void | Promise<void>
+    variant?: 'default' | 'destructive'
+  }>({ open: false, title: '', description: '', onConfirm: () => {} })
+  
+  const notification = useNotification()
 
   useEffect(() => {
     if (user?.role !== "admin") {
@@ -66,32 +77,60 @@ export function AdminPage() {
   }, [user, navigate])
   
   const handleApprove = async (examId: string) => {
-    try {
-      await api.updateExam(examId, { status: "published" })
-      setPendingExams((prevExams) => prevExams.filter((exam) => exam.id !== examId))
-    } catch (err) {
-      alert((err as Error).message || "Failed to approve exam.")
-    }
+    const exam = pendingExams.find(e => e.id === examId)
+    setConfirmDialog({
+      open: true,
+      title: 'Phê duyệt bài thi',
+      description: `Bạn có chắc chắn muốn phê duyệt bài thi "${exam?.title}"? Bài thi sẽ được xuất bản và học sinh có thể làm bài.`,
+      variant: 'default',
+      onConfirm: async () => {
+        try {
+          await api.updateExam(examId, { status: "published" })
+          setPendingExams((prevExams) => prevExams.filter((exam) => exam.id !== examId))
+          notification.success('Thành công', 'Bài thi đã được phê duyệt và xuất bản')
+        } catch (err) {
+          notification.error('Lỗi', (err as Error).message || 'Không thể phê duyệt bài thi')
+        }
+      }
+    })
   }
 
   const handleReject = async (examId: string) => {
-    try {
-      await api.updateExam(examId, { status: "rejected" })
-      setPendingExams((prevExams) => prevExams.filter((exam) => exam.id !== examId))
-    } catch (err) {
-      alert((err as Error).message || "Failed to reject exam.")
-    }
+    const exam = pendingExams.find(e => e.id === examId)
+    setConfirmDialog({
+      open: true,
+      title: 'Từ chối bài thi',
+      description: `Bạn có chắc chắn muốn từ chối bài thi "${exam?.title}"? Bài thi sẽ không được xuất bản.`,
+      variant: 'destructive',
+      onConfirm: async () => {
+        try {
+          await api.updateExam(examId, { status: "rejected" })
+          setPendingExams((prevExams) => prevExams.filter((exam) => exam.id !== examId))
+          notification.warning('Từ chối', 'Bài thi đã bị từ chối')
+        } catch (err) {
+          notification.error('Lỗi', (err as Error).message || 'Không thể từ chối bài thi')
+        }
+      }
+    })
   }
 
   const handleDeleteUser = async (userId: string) => {
-    if (!window.confirm("Are you sure you want to delete this user?")) return
-
-    try {
-      await api.deleteUser(userId)
-      setUsers(prevUsers => prevUsers.filter((u) => u.id !== userId))
-    } catch (err) {
-      alert((err as Error).message || "Failed to delete user.")
-    }
+    const user = users.find(u => u.id === userId)
+    setConfirmDialog({
+      open: true,
+      title: 'Xóa người dùng',
+      description: `Bạn có chắc chắn muốn xóa người dùng "${user?.name}"? Hành động này không thể hoàn tác.`,
+      variant: 'destructive',
+      onConfirm: async () => {
+        try {
+          await api.deleteUser(userId)
+          setUsers(prevUsers => prevUsers.filter((u) => u.id !== userId))
+          notification.success('Thành công', 'Người dùng đã được xóa')
+        } catch (err) {
+          notification.error('Lỗi', (err as Error).message || 'Không thể xóa người dùng')
+        }
+      }
+    })
   }
   
   const handleSaveUser = async (savedUser: ApiUser & { password?: string }): Promise<void> => {
@@ -108,6 +147,7 @@ export function AdminPage() {
         }
         const { user: newUser } = await api.createUser(payload)
         setUsers(prevUsers => [newUser as ApiUser, ...prevUsers])
+        notification.success('Thành công', 'Người dùng mới đã được tạo')
       } else {
         // Update existing user via API
         const payload: any = {
@@ -121,9 +161,11 @@ export function AdminPage() {
         }
         const { user: updatedUser } = await api.updateUser(savedUser.id, payload)
         setUsers(prevUsers => prevUsers.map((u) => (u.id === savedUser.id ? updatedUser as ApiUser : u)))
+        notification.success('Thành công', 'Thông tin người dùng đã được cập nhật')
       }
     } catch (err) {
       console.error("Failed to save user:", err)
+      notification.error('Lỗi', (err as Error).message || 'Không thể lưu thông tin người dùng')
       throw err
     }
   }
@@ -280,6 +322,14 @@ export function AdminPage() {
           onOpenChange={setIsUserFormOpen}
           onSave={handleSaveUser}
           user={editingUser}
+        />
+        <ConfirmDialog
+          open={confirmDialog.open}
+          onOpenChange={(open) => setConfirmDialog({ ...confirmDialog, open })}
+          title={confirmDialog.title}
+          description={confirmDialog.description}
+          variant={confirmDialog.variant}
+          onConfirm={confirmDialog.onConfirm}
         />
       </main>
     </div>

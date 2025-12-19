@@ -1,6 +1,3 @@
-# Flutter SDK (không nên commit vào Git)
-flutter/
-
 # Node modules
 backend0-main/node_modules/
 frontend-react/node_modules/
