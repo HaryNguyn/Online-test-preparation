@@ -37,6 +37,9 @@ app.use(cors({
 app.use(express.json()); //utilizes the body-parser package
 app.use(express.urlencoded({ extended: true }));
 
+// Serve static files from public directory (for uploads)
+app.use(express.static('public'));
+
 // config template engine
 configViewEngine(app);
 
@@ -48,9 +51,6 @@ app.use('/api/users', userRoutes); // Mount user routes
 app.use('/', webRoutes);
 
 // test connection
- 
-// Thêm dòng này nếu chưa có
-app.use(express.static('public'));
 
 //simple query
 // connection.query(

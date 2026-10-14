@@ -1,4 +1,40 @@
-# React + TypeScript + Vite
+# ExamPrep Frontend - React + TypeScript + Vite
+
+ExamPrep is an online learning and exam preparation platform with an intelligent chatbot assistant.
+
+## 🤖 New Chatbot Features
+
+### Intelligent Natural Language Understanding
+The chatbot now understands natural Vietnamese and English commands and can:
+- **Find Videos**: "Tôi cần xem video môn Toán" or "Show me math videos"
+- **Find Tests**: "Cho tôi bài kiểm tra Lý" or "Test for Physics"
+- **View Results**: "Xem kết quả của tôi" or "Show my results"
+- **Answer Questions**: "Định luật Newton là gì?" or "What is Newton's law?"
+- **System Guidance**: "Làm thế nào để làm bài thi?" or "How to take a test?"
+
+### Key Improvements
+- ✅ **Smart Intent Detection**: Understands various ways users express their needs
+- ✅ **Enhanced Subject Mapping**: Supports synonyms (toán, toan, math → Toán)
+- ✅ **Contextual Responses**: Provides relevant, personalized responses
+- ✅ **Real-time Search**: Instant search results with visual display
+- ✅ **Helpful Suggestions**: Offers alternatives when no results found
+
+### Documentation
+- 📚 **[Chatbot Guide](../CHATBOT_GUIDE.md)**: Complete guide to using the chatbot
+- 🎯 **[Example Commands](../CHATBOT_EXAMPLES.md)**: 100+ example commands with expected behaviors
+- 🧪 **Demo Component**: Use `chatbot-demo.tsx` to test chatbot features
+
+### Testing the Chatbot
+1. Start the development server
+2. Click the chatbot icon (bottom-right corner)
+3. Try example commands:
+   - "Tôi cần xem video môn Toán lớp 10"
+   - "Cho tôi bài kiểm tra Hóa"
+   - "Xem kết quả của tôi"
+
+---
+
+## React + TypeScript + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 

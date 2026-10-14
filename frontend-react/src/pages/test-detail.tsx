@@ -9,6 +9,7 @@ import { Progress } from "@/components/ui/progress"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
+import { Input } from "@/components/ui/input"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -21,8 +22,8 @@ import {
 } from "@/components/ui/alert-dialog"
 import { api } from "@/lib/api"
 import { mapExamToTest } from "@/lib/mappers"
-import type { Test } from "@/lib/types"
-import { Clock, CheckCircle2, AlertCircle } from "lucide-react"
+import type { Test, EssayAnswer } from "@/lib/types"
+import { Clock, CheckCircle2, AlertCircle, Upload, File, X } from "lucide-react"
 
 /**
  * Shuffle array using Fisher-Yates algorithm
@@ -95,8 +96,8 @@ export function TestDetailPage() {
 
   const [test, setTest] = useState<Test | null>(null)
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
-  // answers can be number (single), number[] (multiple), string (essay) or null
-  const [answers, setAnswers] = useState<Array<number | number[] | string | null>>([])
+  // answers can be number (single), number[] (multiple), string (essay) or EssayAnswer object or null
+  const [answers, setAnswers] = useState<Array<number | number[] | string | EssayAnswer | null>>([])
   const [timeRemaining, setTimeRemaining] = useState(0)
   const [isStarted, setIsStarted] = useState(false)
   const [showSubmitDialog, setShowSubmitDialog] = useState(false)
@@ -197,23 +198,61 @@ export function TestDetailPage() {
 
     if (dataSource === "backend") {
       try {
-        console.log(' Submitting answers:', answers)
-        console.log(' Answer types:', answers.map((a, i) => ({ index: i, type: typeof a, value: a })))
+        console.log('📝 Submitting answers:', answers)
+        console.log('🔍 Answer types:', answers.map((a, i) => ({ index: i, type: typeof a, value: a })))
         
-        const { submission } = await api.createSubmission({
-          exam_id: test.id,
-          student_id: user.id,
-          answers,
-          score: calculatedScore,
-          total_marks: totalMarks,
-          percentage,
-          time_taken: timeTaken,
+        // Collect files and prepare simplified answers for JSON
+        const files: File[] = []
+        const fileMapping: Record<number, number> = {} // questionIndex -> fileIndex
+        const simplifiedAnswers = answers.map((answer, index) => {
+          if (answer && typeof answer === 'object' && 'text' in answer) {
+            // This is an essay answer with possible file
+            const essayAnswer = answer as EssayAnswer
+            if (essayAnswer.file) {
+              fileMapping[index] = files.length
+              files.push(essayAnswer.file)
+            }
+            return essayAnswer.text
+          }
+          return answer
         })
-        
-        console.log('✅ Submission response:', submission)
-        // Small delay to ensure submission is saved before redirect
-        await new Promise(resolve => setTimeout(resolve, 100))
-        navigate(`/result/${submission.id}`, { replace: true })
+
+        console.log('📎 Files to upload:', files.length)
+        console.log('🗺️ File mapping:', fileMapping)
+
+        // Check if we have any files to upload
+        if (files.length > 0) {
+          const { submission } = await api.createSubmissionWithFiles({
+            exam_id: test.id,
+            student_id: user.id,
+            answers: simplifiedAnswers,
+            score: calculatedScore,
+            total_marks: totalMarks,
+            percentage,
+            time_taken: timeTaken,
+            files,
+            fileMapping,
+          })
+          
+          console.log('✅ Submission response:', submission)
+          await new Promise(resolve => setTimeout(resolve, 100))
+          navigate(`/result/${submission.id}`, { replace: true })
+        } else {
+          // No files, use regular submission
+          const { submission } = await api.createSubmission({
+            exam_id: test.id,
+            student_id: user.id,
+            answers: simplifiedAnswers,
+            score: calculatedScore,
+            total_marks: totalMarks,
+            percentage,
+            time_taken: timeTaken,
+          })
+          
+          console.log('✅ Submission response:', submission)
+          await new Promise(resolve => setTimeout(resolve, 100))
+          navigate(`/result/${submission.id}`, { replace: true })
+        }
         return
       } catch (error) {
         console.error("Failed to submit via API:", error)
@@ -301,7 +340,29 @@ export function TestDetailPage() {
 
   const handleEssayChange = (questionIndex: number, text: string) => {
     const newAnswers = [...answers]
-    newAnswers[questionIndex] = text
+    const currentAnswer = newAnswers[questionIndex]
+    
+    if (currentAnswer && typeof currentAnswer === 'object' && 'text' in currentAnswer) {
+      // Update existing EssayAnswer object
+      newAnswers[questionIndex] = { ...currentAnswer, text }
+    } else {
+      // Create new EssayAnswer object
+      newAnswers[questionIndex] = { text, file: null }
+    }
+    setAnswers(newAnswers)
+  }
+
+  const handleEssayFileChange = (questionIndex: number, file: File | null) => {
+    const newAnswers = [...answers]
+    const currentAnswer = newAnswers[questionIndex]
+    
+    if (currentAnswer && typeof currentAnswer === 'object' && 'text' in currentAnswer) {
+      // Update existing EssayAnswer object
+      newAnswers[questionIndex] = { ...currentAnswer, file }
+    } else {
+      // Create new EssayAnswer object with file
+      newAnswers[questionIndex] = { text: '', file }
+    }
     setAnswers(newAnswers)
   }
 
@@ -511,16 +572,78 @@ export function TestDetailPage() {
                 )}
 
                 {currentQuestion.questionType === 'essay' && (
-                  <div className="space-y-2">
-                    <Textarea 
-                      id={`essay-${currentQuestionIndex}`}
-                      name={`essay-${currentQuestionIndex}`}
-                      value={(answers[currentQuestionIndex] as string) || ""} 
-                      onChange={(e: any) => handleEssayChange(currentQuestionIndex, e.target.value)} 
-                      placeholder="Write your essay answer here..." 
-                      className="min-h-[200px]"
-                    />
-                    <p className="text-sm text-muted-foreground">This answer will be graded manually by a teacher.</p>
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor={`essay-${currentQuestionIndex}`}>Your Answer</Label>
+                      <Textarea 
+                        id={`essay-${currentQuestionIndex}`}
+                        name={`essay-${currentQuestionIndex}`}
+                        value={
+                          answers[currentQuestionIndex] && 
+                          typeof answers[currentQuestionIndex] === 'object' && 
+                          'text' in (answers[currentQuestionIndex] as EssayAnswer)
+                            ? (answers[currentQuestionIndex] as EssayAnswer).text
+                            : (typeof answers[currentQuestionIndex] === 'string' ? answers[currentQuestionIndex] as string : '')
+                        }
+                        onChange={(e: any) => handleEssayChange(currentQuestionIndex, e.target.value)} 
+                        placeholder="Write your essay answer here..." 
+                        className="min-h-[200px]"
+                      />
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor={`essay-file-${currentQuestionIndex}`}>
+                        Upload File (Optional)
+                      </Label>
+                      <div className="flex items-center gap-2">
+                        <Input
+                          id={`essay-file-${currentQuestionIndex}`}
+                          type="file"
+                          accept=".doc,.docx,.pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/pdf"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0]
+                            if (file) {
+                              const maxSize = 10 * 1024 * 1024 // 10MB
+                              if (file.size > maxSize) {
+                                alert('File size must be less than 10MB')
+                                e.target.value = ''
+                                return
+                              }
+                              handleEssayFileChange(currentQuestionIndex, file)
+                            }
+                          }}
+                          className="flex-1"
+                        />
+                        {answers[currentQuestionIndex] && 
+                         typeof answers[currentQuestionIndex] === 'object' && 
+                         'file' in (answers[currentQuestionIndex] as EssayAnswer) &&
+                         (answers[currentQuestionIndex] as EssayAnswer).file && (
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleEssayFileChange(currentQuestionIndex, null)}
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        )}
+                      </div>
+                      {answers[currentQuestionIndex] && 
+                       typeof answers[currentQuestionIndex] === 'object' && 
+                       'file' in (answers[currentQuestionIndex] as EssayAnswer) &&
+                       (answers[currentQuestionIndex] as EssayAnswer).file && (
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                          <File className="h-4 w-4" />
+                          <span>{(answers[currentQuestionIndex] as EssayAnswer).file?.name}</span>
+                          <span className="text-xs">
+                            ({((answers[currentQuestionIndex] as EssayAnswer).file?.size || 0 / 1024).toFixed(0)} KB)
+                          </span>
+                        </div>
+                      )}
+                      <p className="text-sm text-muted-foreground">
+                        Accepted formats: DOC, DOCX, PDF (Max 10MB). This answer will be graded manually by a teacher.
+                      </p>
+                    </div>
                   </div>
                 )}
               </CardContent>

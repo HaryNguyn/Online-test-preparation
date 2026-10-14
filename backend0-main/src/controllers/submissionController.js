@@ -1,16 +1,36 @@
 const connection = require('../config/database');
 const { v4: uuidv4 } = require('uuid');
+const path = require('path');
 
 const submissionController = {
     createSubmission: async (req, res) => {
         try {
-            const { exam_id, student_id, answers, score, total_marks, percentage, time_taken } = req.body;
+            const { exam_id, student_id, answers, score, total_marks, percentage, time_taken, fileMapping } = req.body;
 
             console.log('📥 Received submission - answers:', answers);
+            console.log('📎 Uploaded files:', req.files ? req.files.length : 0);
+            console.log('🗺️ File mapping:', fileMapping);
             console.log('📊 Answer types:', Array.isArray(answers) ? answers.map((a, i) => ({ index: i, type: typeof a, value: a })) : 'Not an array');
 
             if (!exam_id || !student_id || !answers) {
                 return res.status(400).json({ error: 'Required fields are missing' });
+            }
+
+            // Process uploaded files and create essay_files mapping
+            const essayFiles = {};
+            if (req.files && req.files.length > 0 && fileMapping) {
+                const mapping = JSON.parse(fileMapping);
+                console.log('📋 Parsed file mapping:', mapping);
+                
+                // Map questionIndex -> file URL
+                Object.entries(mapping).forEach(([questionIndex, fileIndex]) => {
+                    const file = req.files[parseInt(fileIndex)];
+                    if (file) {
+                        const fileUrl = `/uploads/submissions/${file.filename}`;
+                        essayFiles[questionIndex] = fileUrl;
+                        console.log(`📎 Question ${questionIndex} -> File: ${fileUrl}`);
+                    }
+                });
             }
 
             // Check if exam exists and get questions
@@ -82,14 +102,17 @@ const submissionController = {
 
             const submissionId = uuidv4();
 
-            // Insert submission
+            // Insert submission with essay_files
             const answersJson = JSON.stringify(answers);
+            const essayFilesJson = Object.keys(essayFiles).length > 0 ? JSON.stringify(essayFiles) : null;
+            
             console.log('💾 Storing answers as JSON:', answersJson);
+            console.log('📎 Storing essay files:', essayFilesJson);
             console.log('📌 Grading status:', gradingStatus, 'Score:', finalScore);
             
             await connection.query(
-                'INSERT INTO Submissions (id, exam_id, student_id, answers, score, total_marks, percentage, time_taken, grading_status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
-                [submissionId, exam_id, student_id, answersJson, finalScore, total_marks, finalPercentage, time_taken, gradingStatus]
+                'INSERT INTO Submissions (id, exam_id, student_id, answers, score, total_marks, percentage, time_taken, grading_status, essay_files) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+                [submissionId, exam_id, student_id, answersJson, finalScore, total_marks, finalPercentage, time_taken, gradingStatus, essayFilesJson]
             );
 
             // Insert into leaderboard only if fully graded
@@ -102,6 +125,15 @@ const submissionController = {
             }
 
             const [submission] = await connection.query('SELECT * FROM Submissions WHERE id = ?', [submissionId]);
+
+            // Parse essay_files back to object for response
+            if (submission[0].essay_files) {
+                try {
+                    submission[0].essay_files = JSON.parse(submission[0].essay_files);
+                } catch (e) {
+                    console.error('Failed to parse essay_files:', e);
+                }
+            }
 
             res.status(201).json({
                 message: 'Submission created successfully',
@@ -207,6 +239,19 @@ const submissionController = {
                     }
                 } else {
                     console.log('✅ Answers already parsed by MySQL driver');
+                }
+            }
+
+            // Parse essay_files if it exists
+            if (submission.essay_files) {
+                if (typeof submission.essay_files === 'string') {
+                    try {
+                        submission.essay_files = JSON.parse(submission.essay_files);
+                        console.log('📎 Parsed essay_files:', submission.essay_files);
+                    } catch (e) {
+                        console.error('❌ Failed to parse essay_files:', e);
+                        submission.essay_files = null;
+                    }
                 }
             }
             

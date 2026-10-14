@@ -8,6 +8,7 @@ const userMappingController = require('../controllers/userMappingController');
 const videoController = require('../controllers/videoController');
 const { upload, uploadController } = require('../controllers/uploadController');
 const documentParserController = require('../controllers/documentParserController');
+const submissionUpload = require('../config/multer');
 
 // Auth routes
 router.post('/auth/register', authController.register);
@@ -25,8 +26,8 @@ router.post('/exams', examController.createExam);
 router.put('/exams/:id', examController.updateExam);
 router.delete('/exams/:id', examController.deleteExam);
 
-// Submission routes
-router.post('/submissions', submissionController.createSubmission);
+// Submission routes - with multer middleware for file uploads
+router.post('/submissions', submissionUpload.array('files', 10), submissionController.createSubmission);
 router.get('/submissions/student/:studentId', submissionController.getStudentSubmissions);
 router.get('/submissions/exam/:examId', submissionController.getExamSubmissions);
 router.get('/submissions/pending', submissionController.getPendingSubmissions);

@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import type { ExamDTO, ExamQuestionDTO, SubmissionDTO } from "@/lib/types"
-import { CheckCircle2, Clock, FileText, Save, ArrowLeft } from "lucide-react"
+import { CheckCircle2, Clock, FileText, Save, ArrowLeft, Download, File } from "lucide-react"
 import { toast } from "@/hooks/use-toast"
 import { normalizeAnswers } from "@/lib/utils"
 
@@ -291,9 +291,41 @@ export default function TeacherGrading() {
                         {studentAnswer && String(studentAnswer).trim() ? (
                           String(studentAnswer)
                         ) : (
-                          <span className="text-muted-foreground italic">No answer provided</span>
+                          <span className="text-muted-foreground italic">No text answer provided</span>
                         )}
                       </div>
+                      
+                      {/* Show attached file if exists */}
+                      {submission.essay_files && submission.essay_files[idx] && (
+                        <div className="mt-4 p-4 border rounded-md bg-background">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              <File className="h-5 w-5 text-blue-600" />
+                              <div>
+                                <p className="font-medium">Attached File</p>
+                                <p className="text-sm text-muted-foreground">
+                                  {submission.essay_files[idx].split('/').pop() || 'essay-file.pdf'}
+                                </p>
+                              </div>
+                            </div>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => {
+                                // Open file in new tab for viewing/downloading
+                                const fileUrl = submission.essay_files![idx]
+                                const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080'
+                                const fullUrl = baseUrl.replace('/api', '') + fileUrl
+                                console.log('Opening file:', fullUrl)
+                                window.open(fullUrl, '_blank')
+                              }}
+                            >
+                              <Download className="mr-2 h-4 w-4" />
+                              View/Download
+                            </Button>
+                          </div>
+                        </div>
+                      )}
                     </div>
 
                     <Separator />

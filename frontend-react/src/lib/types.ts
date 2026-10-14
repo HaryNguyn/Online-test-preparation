@@ -23,6 +23,13 @@ export interface Question {
   topic?: string
 }
 
+export interface EssayAnswer {
+  text: string
+  file?: File | null
+  fileUrl?: string | null
+  fileName?: string | null
+}
+
 export interface ExamQuestionDTO {
   id: string
   question_text: string
@@ -71,6 +78,7 @@ export interface SubmissionDTO {
   graded_by?: string | null
   graded_at?: string | null
   student_name?: string | null
+  essay_files?: Record<number, string> | null  // questionIndex -> file URL
 }
 
 export interface Test {
@@ -92,7 +100,7 @@ export interface TestResult {
   id: string
   userId: string
   testId: string
-  answers: Array<number | number[] | string | null>
+  answers: Array<number | number[] | string | EssayAnswer | null>
   score: number
   totalQuestions: number
   timeTaken: number

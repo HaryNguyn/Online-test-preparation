@@ -118,6 +118,58 @@ export const api = {
     time_taken: number
   }) => request<{ submission: SubmissionDTO }>(`/submissions`, { method: "POST", body: JSON.stringify(payload) }),
 
+  createSubmissionWithFiles: async (payload: {
+    exam_id: string
+    student_id: string
+    answers: unknown
+    score: number
+    total_marks: number
+    percentage: number
+    time_taken: number
+    files?: File[]
+    fileMapping?: Record<number, number> // questionIndex -> fileIndex
+  }) => {
+    const formData = new FormData()
+    formData.append('exam_id', payload.exam_id)
+    formData.append('student_id', payload.student_id)
+    formData.append('answers', JSON.stringify(payload.answers))
+    formData.append('score', payload.score.toString())
+    formData.append('total_marks', payload.total_marks.toString())
+    formData.append('percentage', payload.percentage.toString())
+    formData.append('time_taken', payload.time_taken.toString())
+    
+    // Attach file mapping if present
+    if (payload.fileMapping) {
+      formData.append('fileMapping', JSON.stringify(payload.fileMapping))
+    }
+    
+    // Attach files if present
+    if (payload.files && payload.files.length > 0) {
+      payload.files.forEach((file, index) => {
+        formData.append(`files`, file)
+      })
+    }
+
+    const res = await fetch(`${API_BASE}/submissions`, {
+      method: 'POST',
+      body: formData,
+      credentials: 'include',
+    })
+
+    if (!res.ok) {
+      let message = `HTTP ${res.status}`
+      try {
+        const data = await res.json()
+        message = (data && (data.error || data.message)) || message
+      } catch {
+        // ignore json parse errors
+      }
+      throw new Error(message)
+    }
+
+    return res.json() as Promise<{ submission: SubmissionDTO }>
+  },
+
   getStudentSubmissions: (studentId: string) =>
     request<{ submissions: SubmissionDTO[] }>(`/submissions/student/${studentId}`),
 

@@ -1,16 +1,18 @@
 import { api } from "./api"
 import { mapExamToTest } from "./mappers"
-import type { Test, VideoDTO, TestResult, SubmissionDTO } from "./types"
+import type { Test, VideoDTO, TestResult, SubmissionDTO, LeaderboardEntry } from "./types"
 
 export interface SearchResult {
-  type: "test" | "video" | "result"
-  data: Test | VideoDTO | TestResult
+  type: "test" | "video" | "result" | "leaderboard"
+  data: Test | VideoDTO | TestResult | LeaderboardEntry
 }
 
 export interface SearchResponse {
   tests?: Test[]
   videos?: VideoDTO[]
   results?: TestResult[]
+  leaderboard?: LeaderboardEntry[]
+  userRank?: number
   message?: string
 }
 
@@ -28,18 +30,64 @@ export async function searchTests(
 
     // Try to extract subject or grade from query
     const lowerQuery = query.toLowerCase()
-    const subjects = ["toán", "văn", "anh", "lý", "hóa", "sinh", "sử", "địa"]
+    
+    // Enhanced subject mapping with synonyms
+    const subjectMap: { [key: string]: string } = {
+      "toán": "Toán",
+      "toan": "Toán",
+      "math": "Toán",
+      "văn": "Văn",
+      "van": "Văn",
+      "ngữ văn": "Văn",
+      "ngu van": "Văn",
+      "literature": "Văn",
+      "anh": "Anh",
+      "tiếng anh": "Anh",
+      "tieng anh": "Anh",
+      "english": "Anh",
+      "lý": "Lý",
+      "ly": "Lý",
+      "vật lý": "Lý",
+      "vat ly": "Lý",
+      "physics": "Lý",
+      "hóa": "Hóa",
+      "hoa": "Hóa",
+      "hóa học": "Hóa",
+      "hoa hoc": "Hóa",
+      "chemistry": "Hóa",
+      "sinh": "Sinh",
+      "sinh học": "Sinh",
+      "sinh hoc": "Sinh",
+      "biology": "Sinh",
+      "sử": "Sử",
+      "su": "Sử",
+      "lịch sử": "Sử",
+      "lich su": "Sử",
+      "history": "Sử",
+      "địa": "Địa",
+      "dia": "Địa",
+      "địa lý": "Địa",
+      "dia ly": "Địa",
+      "geography": "Địa",
+    }
+    
     const grades = ["6", "7", "8", "9", "10", "11", "12"]
 
-    for (const subject of subjects) {
-      if (lowerQuery.includes(subject)) {
-        params.subject = subject.charAt(0).toUpperCase() + subject.slice(1)
+    // Extract subject
+    for (const [key, value] of Object.entries(subjectMap)) {
+      if (lowerQuery.includes(key)) {
+        params.subject = value
         break
       }
     }
 
+    // Extract grade with more patterns
     for (const grade of grades) {
-      if (lowerQuery.includes(`lớp ${grade}`) || lowerQuery.includes(`khối ${grade}`)) {
+      if (
+        lowerQuery.includes(`lớp ${grade}`) || 
+        lowerQuery.includes(`khối ${grade}`) ||
+        lowerQuery.includes(`${grade}`) && /\d/.test(grade)
+      ) {
         params.grade_level = grade
         break
       }
@@ -77,18 +125,64 @@ export async function searchVideos(
 
     // Try to extract subject or grade from query
     const lowerQuery = query.toLowerCase()
-    const subjects = ["toán", "văn", "anh", "lý", "hóa", "sinh", "sử", "địa"]
+    
+    // Enhanced subject mapping with synonyms (same as tests)
+    const subjectMap: { [key: string]: string } = {
+      "toán": "Toán",
+      "toan": "Toán",
+      "math": "Toán",
+      "văn": "Văn",
+      "van": "Văn",
+      "ngữ văn": "Văn",
+      "ngu van": "Văn",
+      "literature": "Văn",
+      "anh": "Anh",
+      "tiếng anh": "Anh",
+      "tieng anh": "Anh",
+      "english": "Anh",
+      "lý": "Lý",
+      "ly": "Lý",
+      "vật lý": "Lý",
+      "vat ly": "Lý",
+      "physics": "Lý",
+      "hóa": "Hóa",
+      "hoa": "Hóa",
+      "hóa học": "Hóa",
+      "hoa hoc": "Hóa",
+      "chemistry": "Hóa",
+      "sinh": "Sinh",
+      "sinh học": "Sinh",
+      "sinh hoc": "Sinh",
+      "biology": "Sinh",
+      "sử": "Sử",
+      "su": "Sử",
+      "lịch sử": "Sử",
+      "lich su": "Sử",
+      "history": "Sử",
+      "địa": "Địa",
+      "dia": "Địa",
+      "địa lý": "Địa",
+      "dia ly": "Địa",
+      "geography": "Địa",
+    }
+    
     const grades = ["6", "7", "8", "9", "10", "11", "12"]
 
-    for (const subject of subjects) {
-      if (lowerQuery.includes(subject)) {
-        params.subject = subject.charAt(0).toUpperCase() + subject.slice(1)
+    // Extract subject
+    for (const [key, value] of Object.entries(subjectMap)) {
+      if (lowerQuery.includes(key)) {
+        params.subject = value
         break
       }
     }
 
+    // Extract grade with more patterns
     for (const grade of grades) {
-      if (lowerQuery.includes(`lớp ${grade}`) || lowerQuery.includes(`khối ${grade}`)) {
+      if (
+        lowerQuery.includes(`lớp ${grade}`) || 
+        lowerQuery.includes(`khối ${grade}`) ||
+        lowerQuery.includes(`${grade}`) && /\d/.test(grade)
+      ) {
         params.grade_level = grade
         break
       }
@@ -170,12 +264,143 @@ export async function searchResults(
 }
 
 /**
+ * Search for leaderboard and find user's rank
+ */
+export async function searchLeaderboard(
+  query: string,
+  userId?: string
+): Promise<{ leaderboard: LeaderboardEntry[]; userRank?: number }> {
+  try {
+    const lowerQuery = query.toLowerCase()
+    
+    console.log("🔍 searchLeaderboard called with:", { query, userId })
+    
+    // Enhanced subject mapping (same as tests/videos)
+    const subjectMap: { [key: string]: string } = {
+      "toán": "Toán",
+      "toan": "Toán",
+      "math": "Toán",
+      "văn": "Văn",
+      "van": "Văn",
+      "ngữ văn": "Văn",
+      "ngu van": "Văn",
+      "literature": "Văn",
+      "anh": "Anh",
+      "tiếng anh": "Anh",
+      "tieng anh": "Anh",
+      "english": "Anh",
+      "lý": "Lý",
+      "ly": "Lý",
+      "vật lý": "Lý",
+      "vat ly": "Lý",
+      "physics": "Lý",
+      "hóa": "Hóa",
+      "hoa": "Hóa",
+      "hóa học": "Hóa",
+      "hoa hoc": "Hóa",
+      "chemistry": "Hóa",
+      "sinh": "Sinh",
+      "sinh học": "Sinh",
+      "sinh hoc": "Sinh",
+      "biology": "Sinh",
+      "sử": "Sử",
+      "su": "Sử",
+      "lịch sử": "Sử",
+      "lich su": "Sử",
+      "history": "Sử",
+      "địa": "Địa",
+      "dia": "Địa",
+      "địa lý": "Địa",
+      "dia ly": "Địa",
+      "geography": "Địa",
+    }
+    
+    const grades = ["6", "7", "8", "9", "10", "11", "12"]
+    
+    // Build params
+    const params: { limit?: number; subject?: string; grade_level?: string } = {
+      limit: 100, // Get top 100 to find user's rank
+    }
+    
+    // Extract subject
+    for (const [key, value] of Object.entries(subjectMap)) {
+      if (lowerQuery.includes(key)) {
+        params.subject = value
+        break
+      }
+    }
+    
+    // Extract grade
+    for (const grade of grades) {
+      if (
+        lowerQuery.includes(`lớp ${grade}`) || 
+        lowerQuery.includes(`khối ${grade}`) ||
+        lowerQuery.includes(`${grade}`) && /\d/.test(grade)
+      ) {
+        params.grade_level = grade
+        break
+      }
+    }
+    
+    console.log("📊 API params:", params)
+    
+    const response = await api.getGlobalLeaderboard(params)
+    console.log("✅ API response:", response)
+    
+    const leaderboard = response.leaderboard || []
+    console.log("📋 Leaderboard entries:", leaderboard.length)
+    
+    // Find user's rank if userId provided
+    let userRank: number | undefined
+    if (userId && leaderboard.length > 0) {
+      const userIndex = leaderboard.findIndex(entry => entry.userId === userId)
+      if (userIndex !== -1) {
+        userRank = userIndex + 1 // Rank starts from 1
+        console.log("🎯 User rank found:", userRank)
+      } else {
+        console.log("⚠️ User not found in leaderboard")
+      }
+    }
+    
+    return {
+      leaderboard: leaderboard.slice(0, 10), // Return top 10 for display
+      userRank,
+    }
+  } catch (error) {
+    console.error("❌ Error searching leaderboard:", error)
+    return { leaderboard: [] }
+  }
+}
+
+/**
  * Unified search function that searches all types
  */
 export async function searchAll(
   query: string,
   userId?: string
 ): Promise<SearchResponse> {
+  const lowerQuery = query.toLowerCase()
+  
+  console.log("🔎 searchAll called with:", { query, userId })
+  
+  // Check if it's a leaderboard query
+  const isLeaderboardQuery = /bảng xếp hạng|xếp hạng|leaderboard|ranking|top|hạng|rank/i.test(lowerQuery)
+  
+  console.log("🎯 Is leaderboard query?", isLeaderboardQuery)
+  
+  if (isLeaderboardQuery) {
+    // Only search leaderboard
+    console.log("📊 Searching leaderboard...")
+    const { leaderboard, userRank } = await searchLeaderboard(query, userId)
+    console.log("✅ Leaderboard search result:", { count: leaderboard.length, userRank })
+    return {
+      leaderboard,
+      userRank,
+    }
+  }
+  
+  // Normal search for tests, videos, results
+  console.log("🔍 Searching tests, videos, results...")
   const [tests, videos, results] = await Promise.all([
     searchTests(query, userId),
     searchVideos(query, userId),
